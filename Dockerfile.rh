@@ -1,0 +1,29 @@
+# Build stage
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.21@sha256:98a0ff138c536eee98704d6909699ad5d0725a20573e2c510a60ef462b45cce0 AS build-env
+USER root
+RUN mkdir /opt/app-root && \
+    mkdir /opt/app-root/src && \
+    git config --global --add safe.directory /opt/app-root/src
+
+WORKDIR /opt/app-root/src/
+COPY . .
+
+RUN GOFLAGS="" go install golang.org/x/tools/cmd/goimports@latest && \
+    GOFLAGS="" GOBIN=$(pwd)/ GO111MODULE=on go install sigs.k8s.io/kustomize/kustomize/v5@latest && \
+    ./kustomize build config/ > policy-controller.yaml && \
+    make policy-controller
+
+# Install stage
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:8b6978d555746877c73f52375f60fd7b6fd27d6aca000eaed27d0995303c13de
+COPY --from=build-env /opt/app-root/src/policy-controller /usr/local/bin/policy-controller
+WORKDIR /opt/app-root/src/home
+
+LABEL description="The policy-controller admission controller can be used to enforce policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
+LABEL io.k8s.description="The policy-controller admission controller can be used to enforce policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
+LABEL io.k8s.display-name="policy-controller container image for Red Hat Trusted Signer"
+LABEL io.openshift.tags="policy-controller trusted-signer trusted-artifact-signer"
+LABEL summary="Provides the policy-controller admission controller for enforcing policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
+LABEL com.redhat.component="policy-controller"
+LABEL name="policy-controller"
+
+ENTRYPOINT [ "policy-controller" ]
