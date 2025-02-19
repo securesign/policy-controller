@@ -1,6 +1,8 @@
 # Build stage
 FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.21@sha256:98a0ff138c536eee98704d6909699ad5d0725a20573e2c510a60ef462b45cce0 AS build-env
 USER root
+
+# Set up build environment
 RUN mkdir /opt/app-root && \
     mkdir /opt/app-root/src && \
     git config --global --add safe.directory /opt/app-root/src
@@ -8,10 +10,16 @@ RUN mkdir /opt/app-root && \
 WORKDIR /opt/app-root/src/
 COPY . .
 
-RUN GOFLAGS="" go install golang.org/x/tools/cmd/goimports@latest && \
+# Configure policy-controller
+# TODO: Remove this when we have SECURESIGN-1938 figured out
+RUN GOFLAGS="" GOBIN=$(pwd) go install golang.org/x/tools/cmd/goimports@latest && \
     GOFLAGS="" GOBIN=$(pwd)/ GO111MODULE=on go install sigs.k8s.io/kustomize/kustomize/v5@latest && \
     ./kustomize build config/ > policy-controller.yaml && \
-    make policy-controller
+# TODO: I don't know why we need to do this, but builds fail otherwise
+    go mod vendor
+
+# Build policy-controller
+RUN make policy-controller
 
 # Install stage
 FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:8b6978d555746877c73f52375f60fd7b6fd27d6aca000eaed27d0995303c13de
