@@ -288,7 +288,7 @@ require (
 
 // TODO: this dependency causes issues on webhook startup due
 // to conflicting "log_dir" flags between this and klog (knative)
-replace github.com/golang/glog => github.com/jdolitsky/glog v0.0.0-20220729172235-78744e90d087
+replace github.com/golang/glog => github.com/jdolitsky/glog v0.0.0-20210820115315-9ef845f417d8
 
 replace (
 	// knative deps require to use an old k8s.io/gengo so we need to replace these ones
