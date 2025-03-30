@@ -69,7 +69,7 @@ require (
 	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.8.12
 	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.8.12
 	github.com/spf13/viper v1.19.0
-	knative.dev/hack/schema v0.0.0-20240607132042-09143140a254
+	knative.dev/hack/schema v0.0.0-20250318155814-8f599b7a828c
 	knative.dev/pkg v0.0.0-20230612155445-74c4be5e935e
 )
 
