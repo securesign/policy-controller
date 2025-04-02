@@ -1340,8 +1340,8 @@ k8s.io/utils v0.0.0-20241210054802-24370beab758 h1:sdbE21q2nlQtFh65saZY+rRM6x6aJ
 k8s.io/utils v0.0.0-20241210054802-24370beab758/go.mod h1:OLgZIPagt7ERELqWJFomSt595RzquPNLL48iOWgYOg0=
 knative.dev/hack v0.0.0-20240111013919-e89096d74d85 h1:ERgPObDcW9LfaEPAeFvbW3UJcF3C3ul6B2ErNMv13OE=
 knative.dev/hack v0.0.0-20240111013919-e89096d74d85/go.mod h1:yk2OjGDsbEnQjfxdm0/HJKS2WqTLEFg/N6nUs6Rqx3Q=
-knative.dev/hack/schema v0.0.0-20240607132042-09143140a254 h1:b9hFHGtxx0Kpm4EEjSD72lL0jms91To3OEVBTbqfOYI=
-knative.dev/hack/schema v0.0.0-20240607132042-09143140a254/go.mod h1:3pWwBLnTZSM9psSgCAvhKOHIPTzqfEMlWRpDu6IYhK0=
+knative.dev/hack/schema v0.0.0-20250318155814-8f599b7a828c h1:HYqG0JdfMo6H/YA4lZxk1dKWUtGRnef0iI+iIXTMgN0=
+knative.dev/hack/schema v0.0.0-20250318155814-8f599b7a828c/go.mod h1:KkibP1IazICP5ClxwN5D26LDSygsqbYnVGuGFTsHNOQ=
 knative.dev/pkg v0.0.0-20230612155445-74c4be5e935e h1:koM+NopG2Yw738NlJhQF3ZwpyS+HHznuLm294VYlUKg=
 knative.dev/pkg v0.0.0-20230612155445-74c4be5e935e/go.mod h1:dqC6IrvyBE7E+oZocs5PkVhq1G59pDTA7r8U17EAKMk=
 rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8=
