@@ -40,7 +40,7 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/time v0.10.0
 	google.golang.org/grpc v1.69.2 // indirect
-	google.golang.org/protobuf v1.36.4
+	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.32.0
 	k8s.io/apimachinery v0.32.0
@@ -64,7 +64,7 @@ require (
 	github.com/docker/docker-credential-helpers v0.8.2
 	github.com/docker/go-connections v0.5.0
 	github.com/go-jose/go-jose/v4 v4.0.5
-	github.com/sigstore/protobuf-specs v0.3.3
+	github.com/sigstore/protobuf-specs v0.4.1
 	github.com/sigstore/scaffolding v0.7.18
 	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.8.12
 	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.8.12
