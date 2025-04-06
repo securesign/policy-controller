@@ -36,7 +36,7 @@ require (
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.36.0
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/time v0.10.0
 	google.golang.org/grpc v1.69.2 // indirect
