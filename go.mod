@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.32.8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/google/go-containerregistry v0.20.2
 	github.com/google/go-containerregistry/pkg/authn/k8schain v0.0.0-20250225234217-098045d5e61f
 	github.com/google/go-containerregistry/pkg/authn/kubernetes v0.0.0-20250225234217-098045d5e61f
@@ -24,7 +24,7 @@ require (
 	github.com/hashicorp/golang-lru v1.0.2
 	github.com/hashicorp/hcl v1.0.1-vault-7
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/letsencrypt/boulder v0.0.0-20250328235739-037c654d3d83
+	github.com/letsencrypt/boulder v0.0.0-20250411005613-d800055fe666
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/ryanuber/go-glob v1.0.0
@@ -63,7 +63,7 @@ require (
 	github.com/docker/docker v27.5.0+incompatible
 	github.com/docker/docker-credential-helpers v0.8.2
 	github.com/docker/go-connections v0.5.0
-	github.com/go-jose/go-jose/v4 v4.0.5
+	github.com/go-jose/go-jose/v4 v4.1.0
 	github.com/sigstore/protobuf-specs v0.3.3
 	github.com/sigstore/scaffolding v0.7.18
 	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.8.12
