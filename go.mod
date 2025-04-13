@@ -61,7 +61,7 @@ require (
 	github.com/awslabs/amazon-ecr-credential-helper/ecr-login v0.0.0-20250115170608-608f37feb051
 	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/docker/docker v27.5.0+incompatible
-	github.com/docker/docker-credential-helpers v0.8.2
+	github.com/docker/docker-credential-helpers v0.9.3
 	github.com/docker/go-connections v0.5.0
 	github.com/go-jose/go-jose/v4 v4.0.5
 	github.com/sigstore/protobuf-specs v0.3.3
