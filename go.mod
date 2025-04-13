@@ -32,7 +32,7 @@ require (
 	github.com/sigstore/rekor v1.3.7
 	github.com/sigstore/sigstore v1.8.12
 	github.com/stretchr/testify v1.10.0
-	github.com/theupdateframework/go-tuf v0.7.0
+	github.com/theupdateframework/go-tuf/v2 v2.0.2
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399
 	go.uber.org/zap v1.27.0
 	golang.org/x/crypto v0.36.0
