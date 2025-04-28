@@ -1,0 +1,122 @@
+# Copyright 2021 The Sigstore Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook
+  namespace: rhtas-policy-controller
+spec:
+  selector:
+    matchLabels:
+      role: webhook
+  template:
+    metadata:
+      labels:
+        role: webhook
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  role: webhook
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      serviceAccountName: webhook
+      containers:
+      - name: webhook
+        image: quay.io/securesign/policy-controller@sha256:77ea7af66c7b323e746ce2b783ef63c590307e04a9136af7b8d527e53c7b96cd
+        args: [
+          --webhook-name=$(WEBHOOK_NAME),
+          --tuf-mirror=$(TUF_MIRROR),
+          --tuf-root=$(TUF_ROOT),
+          --disable-tuf=$(DISABLE_TUF),
+          --mutating-webhook-name=$(MUTATING_WEBHOOK_NAME),
+          --validating-webhook-name=$(VALIDATING_WEBHOOK_NAME),
+          --policy-resync-period=$(POLICY_RESYNC_PERIOD),
+          --trustroot-resync-period=$(TRUSTROOT_RESYNC_PERIOD)
+        ]
+        resources:
+          requests:
+            cpu: 40m
+            memory: 40Mi
+          limits:
+            cpu: 400m
+            memory: 400Mi
+        env:
+        - name: SYSTEM_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CONFIG_LOGGING_NAME
+          value: config-logging
+        - name: METRICS_DOMAIN
+          value: sigstore.dev/policy
+        - name: KUBERNETES_MIN_VERSION
+          value: "1.21.0"
+        - name: HOME
+          value: "/var/run/sigstore"
+        - name: WEBHOOK_NAME
+          value: "policy.securesign.dev"
+        - name: TUF_MIRROR
+          value: "https://<tuf-mirror>.com"
+        - name: TUF_ROOT
+          value: ""
+        - name: DISABLE_TUF
+          value: false
+        - name: MUTATING_WEBHOOK_NAME
+          value: "defaulting.clusterimagepolicy.securesign.dev"
+        - name: VALIDATING_WEBHOOK_NAME
+          value: "validating.clusterimagepolicy.securesign.dev"
+        - name: POLICY_RESYNC_PERIOD
+          value: "10h"
+        - name: TRUSTROOT_RESYNC_PERIOD
+          value: "24h"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+        volumeMounts:
+        - name: homedir
+          mountPath: "/var/run/sigstore"
+        - name: tuf-root
+          mountPath: "/var/run/tuf"
+          readOnly: true
+        readinessProbe: &probe
+          failureThreshold: 6
+          initialDelaySeconds: 20
+          periodSeconds: 1
+          httpGet:
+            scheme: HTTPS
+            port: 8443
+            httpHeaders:
+            - name: k-kubelet-probe
+              value: "webhook"
+        livenessProbe: *probe
+      terminationGracePeriodSeconds: 300
+      volumes:
+      - emptyDir: {}
+        name: homedir
+      - name: tuf-root
+        secret:
+          secretName: tuf-root
+          optional: true
+          items:
+          - key: root
+            path: root.json

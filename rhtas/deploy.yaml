@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rhtas-policy-controller
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: policy-controller-catalog
+  namespace: rhtas-policy-controller
+spec:
+  sourceType: grpc
+  image:      quay.io/japower/policy-operator-index@sha256:4e5e1df659b3c9fb30779426f5c0f6069e6a213b9e09429553461ee844f2e7e1
+  displayName: Policy Controller
+  publisher:   My Org
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: policy-controller-og
+  namespace: rhtas-policy-controller
+spec:
+  targetNamespaces:
+    - rhtas-policy-controller
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: policy-controller-sub
+  namespace: rhtas-policy-controller
+spec:
+  channel:          alpha
+  name:             policy-controller
+  source:           policy-controller-catalog
+  sourceNamespace:  rhtas-policy-controller
+  installPlanApproval: Automatic
+  config:
+    env:
+      - name: TUF_MIRROR
+        value: https://tuf-repo-cdn.sigstore.dev
+      - name: MUTATING_WEBHOOK_NAME
+        value: defaulting.clusterimagepolicy.securesign.dev-f56s4
+      - name: VALIDATING_WEBHOOK_NAME
+        value: validating.clusterimagepolicy.securesign.dev-htj4h

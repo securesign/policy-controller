@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  _example: |
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+    no-match-policy: warn
+kind: ConfigMap
+metadata:
+  name: config-policy-controller

@@ -1,0 +1,361 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+    containerImage: placeholder
+    createdAt: "2025-04-28T10:50:43Z"
+    operators.operatorframework.io/builder: operator-sdk-v1.39.2
+    operators.operatorframework.io/project_layout: unknown
+    repository: https://github.com/securesign/policy-controller
+  name: policy-controller.v0.0.1
+  namespace: rhtas-policy-controller
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: ClusterImagePolicy
+      name: clusterimagepolicies.policy.sigstore.dev
+      version: v1alpha1
+    - kind: ClusterImagePolicy
+      name: clusterimagepolicies.policy.sigstore.dev
+      version: v1beta1
+    - kind: TrustRoot
+      name: trustroots.policy.sigstore.dev
+      version: v1alpha1
+  description: Policy Controller description. TODO.
+  displayName: Policy Controller
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - validatingwebhookconfigurations/finalizers
+          - mutatingwebhookconfigurations/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - validatingwebhookconfigurations
+          - mutatingwebhookconfigurations
+          verbs:
+          - list
+          - watch
+        - apiGroups:
+          - admissionregistration.k8s.io
+          resources:
+          - validatingwebhookconfigurations
+          - mutatingwebhookconfigurations
+          verbs:
+          - get
+          - update
+          - delete
+        - apiGroups:
+          - ""
+          resourceNames:
+          - rhtas-policy-controller
+          resources:
+          - namespaces
+          verbs:
+          - get
+        - apiGroups:
+          - ""
+          resources:
+          - namespaces/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - list
+          - watch
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - get
+          - update
+        - apiGroups:
+          - apiextensions.k8s.io
+          resources:
+          - customresourcedefinitions
+          verbs:
+          - get
+          - update
+        - apiGroups:
+          - policy.sigstore.dev
+          resources:
+          - clusterimagepolicies
+          - clusterimagepolicies/status
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+          - patch
+        - apiGroups:
+          - policy.sigstore.dev
+          resources:
+          - trustroots
+          - trustroots/status
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - serviceaccounts
+          - secrets
+          verbs:
+          - get
+        serviceAccountName: webhook
+      deployments:
+      - name: webhook
+        spec:
+          selector:
+            matchLabels:
+              role: webhook
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                role: webhook
+            spec:
+              affinity:
+                podAntiAffinity:
+                  preferredDuringSchedulingIgnoredDuringExecution:
+                  - podAffinityTerm:
+                      labelSelector:
+                        matchLabels:
+                          role: webhook
+                      topologyKey: kubernetes.io/hostname
+                    weight: 100
+              containers:
+              - args:
+                - --webhook-name=$(WEBHOOK_NAME)
+                - --tuf-mirror=$(TUF_MIRROR)
+                - --tuf-root=$(TUF_ROOT)
+                - --disable-tuf=$(DISABLE_TUF)
+                - --mutating-webhook-name=$(MUTATING_WEBHOOK_NAME)
+                - --validating-webhook-name=$(VALIDATING_WEBHOOK_NAME)
+                - --policy-resync-period=$(POLICY_RESYNC_PERIOD)
+                - --trustroot-resync-period=$(TRUSTROOT_RESYNC_PERIOD)
+                env:
+                - name: SYSTEM_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: CONFIG_LOGGING_NAME
+                  value: config-logging
+                - name: METRICS_DOMAIN
+                  value: sigstore.dev/policy
+                - name: KUBERNETES_MIN_VERSION
+                  value: 1.21.0
+                - name: HOME
+                  value: /var/run/sigstore
+                - name: WEBHOOK_NAME
+                  value: policy.securesign.dev
+                - name: TUF_MIRROR
+                  value: https://<tuf-mirror>.com
+                - name: TUF_ROOT
+                - name: DISABLE_TUF
+                  value: "false"
+                - name: MUTATING_WEBHOOK_NAME
+                  value: defaulting.clusterimagepolicy.securesign.dev
+                - name: VALIDATING_WEBHOOK_NAME
+                  value: validating.clusterimagepolicy.securesign.dev
+                - name: POLICY_RESYNC_PERIOD
+                  value: 10h
+                - name: TRUSTROOT_RESYNC_PERIOD
+                  value: 24h
+                image: quay.io/securesign/policy-controller@sha256:77ea7af66c7b323e746ce2b783ef63c590307e04a9136af7b8d527e53c7b96cd
+                livenessProbe:
+                  failureThreshold: 6
+                  httpGet:
+                    httpHeaders:
+                    - name: k-kubelet-probe
+                      value: webhook
+                    port: 8443
+                    scheme: HTTPS
+                  initialDelaySeconds: 20
+                  periodSeconds: 1
+                name: webhook
+                readinessProbe:
+                  failureThreshold: 6
+                  httpGet:
+                    httpHeaders:
+                    - name: k-kubelet-probe
+                      value: webhook
+                    port: 8443
+                    scheme: HTTPS
+                  initialDelaySeconds: 20
+                  periodSeconds: 1
+                resources:
+                  limits:
+                    cpu: 400m
+                    memory: 400Mi
+                  requests:
+                    cpu: 40m
+                    memory: 40Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL
+                  readOnlyRootFilesystem: true
+                  runAsNonRoot: true
+                volumeMounts:
+                - mountPath: /var/run/sigstore
+                  name: homedir
+                - mountPath: /var/run/tuf
+                  name: tuf-root
+                  readOnly: true
+              serviceAccountName: webhook
+              terminationGracePeriodSeconds: 300
+              volumes:
+              - emptyDir: {}
+                name: homedir
+              - name: tuf-root
+                secret:
+                  items:
+                  - key: root
+                    path: root.json
+                  optional: true
+                  secretName: tuf-root
+      permissions:
+      - rules:
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          - secrets
+          verbs:
+          - get
+          - list
+          - update
+          - watch
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs:
+          - get
+          - list
+          - create
+          - update
+          - delete
+          - patch
+          - watch
+        - apiGroups:
+          - ""
+          resourceNames:
+          - config-image-policies
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - create
+          - update
+          - patch
+          - watch
+        - apiGroups:
+          - ""
+          resourceNames:
+          - config-sigstore-keys
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - create
+          - update
+          - patch
+          - watch
+        serviceAccountName: webhook
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - policy-controller
+  links:
+  - name: Policy Controller
+    url: https://policy-controller.domain
+  maintainers:
+  - email: your@email.com
+    name: Maintainer Name
+  maturity: alpha
+  minKubeVersion: 1.26.0
+  provider:
+    name: Provider Name
+    url: https://your.domain
+  version: 0.0.1
+  webhookdefinitions:
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: webhook
+    failurePolicy: Fail
+    generateName: defaulting.clusterimagepolicy.securesign.dev
+    matchPolicy: Equivalent
+    sideEffects: None
+    targetPort: 8443
+    type: MutatingAdmissionWebhook
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: webhook
+    failurePolicy: Fail
+    generateName: policy.securesign.dev
+    sideEffects: None
+    targetPort: 8443
+    timeoutSeconds: 25
+    type: ValidatingAdmissionWebhook
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: webhook
+    failurePolicy: Fail
+    generateName: policy.securesign.dev
+    reinvocationPolicy: IfNeeded
+    sideEffects: None
+    targetPort: 8443
+    timeoutSeconds: 25
+    type: MutatingAdmissionWebhook
+  - admissionReviewVersions:
+    - v1
+    containerPort: 443
+    deploymentName: webhook
+    failurePolicy: Fail
+    generateName: validating.clusterimagepolicy.securesign.dev
+    matchPolicy: Equivalent
+    sideEffects: None
+    targetPort: 8443
+    type: ValidatingAdmissionWebhook

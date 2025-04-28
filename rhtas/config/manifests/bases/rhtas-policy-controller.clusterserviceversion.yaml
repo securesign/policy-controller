@@ -1,0 +1,56 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+    containerImage: placeholder
+    repository: https://github.com/securesign/policy-controller
+  name: policy-controller.v0.0.1
+  namespace: rhtas-policy-controller
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - kind: ClusterImagePolicy
+      name: clusterimagepolicies.policy.sigstore.dev
+      version: v1alpha1
+    - kind: ClusterImagePolicy
+      name: clusterimagepolicies.policy.sigstore.dev
+      version: v1beta1
+    - kind: TrustRoot
+      name: trustroots.policy.sigstore.dev
+      version: v1alpha1
+  description: Policy Controller description. TODO.
+  displayName: Policy Controller
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: false
+    type: AllNamespaces
+  keywords:
+  - policy-controller
+  links:
+  - name: Policy Controller
+    url: https://policy-controller.domain
+  maintainers:
+  - email: your@email.com
+    name: Maintainer Name
+  maturity: alpha
+  minKubeVersion: 1.26.0
+  provider:
+    name: Provider Name
+    url: https://your.domain
+  version: 0.0.1
+  webhookdefinitions: []
