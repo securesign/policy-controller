@@ -5,6 +5,8 @@ go 1.23.6
 require (
 	github.com/aws/aws-sdk-go v1.55.6
 	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
+	github.com/aws/aws-sdk-go v1.55.7
+	github.com/aws/aws-sdk-go-v2 v1.32.8 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-cmp v0.7.0
