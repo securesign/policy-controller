@@ -19,6 +19,8 @@ RUN CGO_ENABLED=0 go build -mod=mod \
 FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:e7da3c032ae52bd26e597cc616eed644710e32e5d3bc9212c7edde8ab7799b0e
 COPY --from=build-env /opt/app-root/src/policy-controller /usr/local/bin/policy-controller
 WORKDIR /opt/app-root/src/home
+COPY LICENSE /licenses/LICENSE
+USER 65532:65532
 
 LABEL description="The policy-controller admission controller can be used to enforce policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
 LABEL io.k8s.description="The policy-controller admission controller can be used to enforce policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
