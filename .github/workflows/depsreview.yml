@@ -21,4 +21,5 @@ permissions:
 jobs:
   dependency-review:
     name: dependency-review
+    if: github.repository == 'sigstore/policy-controller'
     uses: sigstore/community/.github/workflows/reusable-dependency-review.yml@9b1b5aca605f92ec5b1bf3681b1e61b3dbc420cc
