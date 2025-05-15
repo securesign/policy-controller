@@ -1,5 +1,5 @@
 # Build stage
-FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.23@sha256:44fd8f88f3b6463cda15571260f9ca3a0b78d3c8c8827a338e04ab3a23581a88 AS build-env
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.23@sha256:4805e1cb2d1bd9d3c5de5d6986056bbda94ca7b01642f721d83d26579d333c60 AS build-env
 WORKDIR /opt/app-root/src/
 USER root
 
@@ -16,7 +16,7 @@ RUN CGO_ENABLED=0 go build -mod=mod \
     -o ./policy-controller ./cmd/webhook
 
 # Install stage
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:e7da3c032ae52bd26e597cc616eed644710e32e5d3bc9212c7edde8ab7799b0e
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:92b1d5747a93608b6adb64dfd54515c3c5a360802db4706765ff3d8470df6290
 COPY --from=build-env /opt/app-root/src/policy-controller /usr/local/bin/policy-controller
 WORKDIR /opt/app-root/src/home
 COPY LICENSE /licenses/LICENSE
