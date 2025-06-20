@@ -41,10 +41,12 @@ import (
 	"github.com/sigstore/policy-controller/pkg/apis/config"
 	policyduckv1beta1 "github.com/sigstore/policy-controller/pkg/apis/duck/v1beta1"
 	policycontrollerconfig "github.com/sigstore/policy-controller/pkg/config"
+	pctuf "github.com/sigstore/policy-controller/pkg/tuf"
 	webhookcip "github.com/sigstore/policy-controller/pkg/webhook/clusterimagepolicy"
 	"github.com/sigstore/policy-controller/pkg/webhook/registryauth"
 	rekor "github.com/sigstore/rekor/pkg/client"
 	"github.com/sigstore/rekor/pkg/generated/client"
+	"github.com/sigstore/sigstore-go/pkg/root"
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
 	"github.com/sigstore/sigstore/pkg/fulcioroots"
 	"github.com/sigstore/sigstore/pkg/signature"
@@ -152,7 +154,7 @@ func (v *Validator) ValidatePodScalable(ctx context.Context, ps *policyduckv1bet
 
 	// If we are being scaled down don't block it.
 	if ps.IsScalingDown(ctx) {
-		logging.FromContext(ctx).Debugf("Skipping validations due to scale down request %s/%s", &ps.ObjectMeta.Name, &ps.ObjectMeta.Namespace)
+		logging.FromContext(ctx).Debugf("Skipping validations due to scale down request %s/%s", &ps.Name, &ps.Namespace)
 		return nil
 	}
 
@@ -974,7 +976,7 @@ func (v *Validator) ResolvePodScalable(ctx context.Context, ps *policyduckv1beta
 	}
 
 	if ps.IsScalingDown(ctx) {
-		logging.FromContext(ctx).Debugf("Skipping validations due to scale down request %s/%s", &ps.ObjectMeta.Name, &ps.ObjectMeta.Namespace)
+		logging.FromContext(ctx).Debugf("Skipping validations due to scale down request %s/%s", &ps.Name, &ps.Namespace)
 		return
 	}
 
@@ -1078,7 +1080,12 @@ func (v *Validator) resolvePodSpec(ctx context.Context, ps *corev1.PodSpec, opt 
 					logging.FromContext(ctx).Debugf("Unable to resolve digest %q: %v", ref.String(), err)
 					continue
 				}
-				cs[i].Image = digest.String()
+				// Keep the original tag and append the digest
+				if tagRef, ok := ref.(name.Tag); ok {
+					cs[i].Image = fmt.Sprintf("%s@%s", tagRef.Name(), digest.DigestStr())
+				} else {
+					cs[i].Image = digest.String()
+				}
 			}
 		}
 	}
@@ -1102,7 +1109,12 @@ func (v *Validator) resolvePodSpec(ctx context.Context, ps *corev1.PodSpec, opt 
 					logging.FromContext(ctx).Debugf("Unable to resolve digest %q: %v", ref.String(), err)
 					continue
 				}
-				cs[i].Image = digest.String()
+				// Keep the original tag and append the digest
+				if tagRef, ok := ref.(name.Tag); ok {
+					cs[i].Image = fmt.Sprintf("%s@%s", tagRef.Name(), digest.DigestStr())
+				} else {
+					cs[i].Image = digest.String()
+				}
 			}
 		}
 	}
@@ -1338,10 +1350,10 @@ func normalizeArchitecture(cf *v1.ConfigFile) string {
 func checkOptsFromAuthority(ctx context.Context, authority webhookcip.Authority, remoteOpts ...ociremote.Option) (*cosign.CheckOpts, error) {
 	ret := &cosign.CheckOpts{
 		RegistryClientOpts: remoteOpts,
+		NewBundleFormat:    authority.SignatureFormat == "bundle",
 	}
 
-	// Add in the identities for verification purposes, as well as Fulcio URL
-	// and certificates
+	// Add in the identities for verification purposes
 	if authority.Keyless != nil {
 		for _, id := range authority.Keyless.Identities {
 			ret.Identities = append(ret.Identities,
@@ -1351,6 +1363,67 @@ func checkOptsFromAuthority(ctx context.Context, authority webhookcip.Authority,
 					IssuerRegExp:  id.IssuerRegExp,
 					SubjectRegExp: id.SubjectRegExp})
 		}
+	}
+
+	if ret.NewBundleFormat {
+		// The new bundle format is only supported for keyless authorities
+		// and the trustRootRef must be set.
+		if authority.Keyless == nil {
+			// TODO: Support the new bundle format for non-keyless authorities
+			return nil, fmt.Errorf("when using the new bundle format, the authority must be keyless")
+		}
+		trustRootRef := authority.Keyless.TrustRootRef
+		if trustRootRef != "" {
+			// Set up TrustedMaterial
+			sigstoreKeys, err := sigstoreKeysFromContext(ctx, trustRootRef)
+			if err != nil {
+				return nil, fmt.Errorf("getting SigstoreKeys: %w", err)
+			}
+			sk, ok := sigstoreKeys.SigstoreKeys[trustRootRef]
+			if !ok {
+				return nil, fmt.Errorf("trustRootRef %s not found", trustRootRef)
+			}
+			ret.TrustedMaterial, err = root.NewTrustedRootFromProtobuf(sk)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create trusted root from protobuf: %w", err)
+			}
+		} else {
+			var err error
+			ret.TrustedMaterial, err = pctuf.GetTrustedRoot(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("failed to fetch trusted root: %w", err)
+			}
+		}
+		if authority.Keyless.InsecureIgnoreSCT != nil && *authority.Keyless.InsecureIgnoreSCT {
+			ret.IgnoreSCT = *authority.Keyless.InsecureIgnoreSCT
+		}
+
+		// Check for custom TSA
+		tsa := authority.RFC3161Timestamp
+		if tsa != nil {
+			if tsa.TrustRootRef != authority.Keyless.TrustRootRef {
+				return nil, fmt.Errorf("when using the new bundle format, the trustRootRef for the TSA must be the same as the trustRootRef for the Keyless authority")
+			}
+			ret.UseSignedTimestamps = true
+		}
+
+		// Check for custom Rekor
+		tlog := authority.CTLog
+		if tlog != nil {
+			if tlog.TrustRootRef != authority.Keyless.TrustRootRef {
+				return nil, fmt.Errorf("when using the new bundle format, the trustRootRef for the TLog must be the same as the trustRootRef for the Keyless authority")
+			}
+			// Only require the TLog if we're not using signed timestamps
+			if ret.UseSignedTimestamps {
+				ret.IgnoreTlog = true
+			}
+		}
+		return ret, nil
+	}
+
+	// If we're not using the new bundle verifier (TrustedMaterial), we need to assemble the other CheckOpts (Fulcio, Rekor, TSA, etc.)
+
+	if authority.Keyless != nil {
 		fulcioRoots, fulcioIntermediates, ctlogKeys, err := fulcioCertsFromAuthority(ctx, authority.Keyless)
 		if err != nil {
 			return nil, fmt.Errorf("getting Fulcio certs: %s: %w", authority.Name, err)

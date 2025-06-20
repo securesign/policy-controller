@@ -29,6 +29,7 @@ require (
 	github.com/sigstore/cosign/v2 v2.5.0
 	github.com/sigstore/rekor v1.3.10
 	github.com/sigstore/sigstore v1.9.3
+	github.com/sigstore/sigstore v1.9.4
 	github.com/stretchr/testify v1.10.0
 	github.com/theupdateframework/go-tuf v0.7.0
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399
@@ -38,6 +39,7 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/time v0.11.0
 	google.golang.org/grpc v1.71.0 // indirect
+	google.golang.org/grpc v1.71.1 // indirect
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.32.3
@@ -69,6 +71,17 @@ require (
 	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.9.3
 	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.9.3
 	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.9.3
+	github.com/docker/docker v28.1.1+incompatible
+	github.com/docker/docker-credential-helpers v0.9.3
+	github.com/docker/go-connections v0.5.0
+	github.com/go-jose/go-jose/v4 v4.1.0
+	github.com/sigstore/protobuf-specs v0.4.1
+	github.com/sigstore/scaffolding v0.7.22
+	github.com/sigstore/sigstore-go v0.7.2
+	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.9.4
+	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.9.4
+	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.9.4
+	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.9.4
 	github.com/spf13/viper v1.20.1
 	knative.dev/hack/schema v0.0.0-20240607132042-09143140a254
 	knative.dev/pkg v0.0.0-20230612155445-74c4be5e935e
@@ -82,6 +95,11 @@ require (
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	cloud.google.com/go/iam v1.5.0 // indirect
 	cloud.google.com/go/kms v1.21.1 // indirect
+	cloud.google.com/go/auth v0.16.0 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
+	cloud.google.com/go/compute/metadata v0.6.0 // indirect
+	cloud.google.com/go/iam v1.5.0 // indirect
+	cloud.google.com/go/kms v1.21.2 // indirect
 	cloud.google.com/go/longrunning v0.6.6 // indirect
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.2 // indirect
@@ -124,6 +142,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ecr v1.44.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ecrpublic v1.33.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ecr v1.40.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ecrpublic v1.31.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.15 // indirect
 	github.com/aws/aws-sdk-go-v2/service/kms v1.38.3 // indirect
@@ -168,6 +188,7 @@ require (
 	github.com/go-openapi/analysis v0.23.0 // indirect
 	github.com/go-openapi/errors v0.22.1 // indirect
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
+	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
 	github.com/go-openapi/loads v0.22.0 // indirect
 	github.com/go-openapi/runtime v0.28.0 // indirect
@@ -184,6 +205,9 @@ require (
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/certificate-transparency-go v1.3.1 // indirect
 	github.com/google/gnostic-models v0.6.9 // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/google/certificate-transparency-go v1.3.1 // indirect
+	github.com/google/gnostic-models v0.6.9-0.20230804172637-c7be7c783f49 // indirect
 	github.com/google/go-github/v55 v55.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
@@ -193,6 +217,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.14.1 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1 // indirect
 	github.com/hashicorp/vault/api v1.16.0 // indirect
 	github.com/in-toto/attestation v1.1.1 // indirect
 	github.com/in-toto/in-toto-golang v0.9.0 // indirect
@@ -206,6 +231,7 @@ require (
 	github.com/mailru/easyjson v0.9.0 // indirect
 	github.com/miekg/pkcs11 v1.1.1 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
+	github.com/moby/sys/atomicwriter v0.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mozillazg/docker-credential-acr-helper v0.4.0 // indirect
@@ -265,6 +291,7 @@ require (
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
+	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f // indirect
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/oauth2 v0.29.0 // indirect
 	golang.org/x/sync v0.13.0 // indirect
@@ -274,6 +301,10 @@ require (
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/api v0.228.0 // indirect
 	google.golang.org/genproto v0.0.0-20250414145226-207652e42e2e // indirect
+	golang.org/x/tools v0.30.0 // indirect
+	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
+	google.golang.org/api v0.229.0 // indirect
+	google.golang.org/genproto v0.0.0-20250303144028-a0af3efb3deb // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250414145226-207652e42e2e // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250414145226-207652e42e2e // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
@@ -287,6 +318,9 @@ require (
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.6.0 // indirect
+	k8s.io/utils v0.0.0-20241210054802-24370beab758 // indirect
+	sigs.k8s.io/json v0.0.0-20241010143419-9aa6b5e7a4b3 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
 )
 
 // TODO: this dependency causes issues on webhook startup due

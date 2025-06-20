@@ -54,7 +54,7 @@ jobs:
 
     env:
       KO_DOCKER_REPO: "registry.local:5000/policy-controller"
-      SCAFFOLDING_RELEASE_VERSION: "v0.7.18"
+      SCAFFOLDING_RELEASE_VERSION: "v0.7.22"
       GO111MODULE: on
       GOFLAGS: -ldflags=-s -ldflags=-w
       KOCACHE: ~/ko
@@ -115,19 +115,19 @@ jobs:
         check-latest: true
 
     # will use the latest release available for ko
-    - uses: ko-build/setup-ko@3aebd0597dc1e9d1a26bcfdb7cbeb19c131d3037 # v0.7
+    - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d # v0.9
 
     - uses: imranismail/setup-kustomize@2ba527d4d055ab63514ba50a99456fc35684947f # v2.1.0
 
     - name: Install yq
-      uses: mikefarah/yq@4839dbbf80445070a31c7a9c1055da527db2d5ee # v4.44.6
+      uses: mikefarah/yq@8bf425b4d1344db7cd469a8d10a390876e0c77fd # v4.45.1
 
     - name: Setup mirror
-      uses: chainguard-dev/actions/setup-mirror@main
+      uses: chainguard-dev/actions/setup-mirror@be6c67b5b374ed43d908ac017ff9b04c271ad3d8 # v1.0.3
       with:
         mirror: mirror.gcr.io
 
-    - uses: sigstore/cosign-installer@dc72c7d5c4d10cd6bcb8cf6e3fd625a9e5e537da
+    - uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a
 
     - name: Install cluster + sigstore
       uses: sigstore/scaffolding/actions/setup@main
@@ -174,4 +174,4 @@ jobs:
 
     - name: Collect diagnostics
       if: ${{ failure() }}
-      uses: chainguard-dev/actions/kind-diag@29fb6e979a0b3efc79748a17e8cec08d0594cbfd # main
+      uses: chainguard-dev/actions/kind-diag@be6c67b5b374ed43d908ac017ff9b04c271ad3d8 # v1.0.3
