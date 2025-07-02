@@ -33,6 +33,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/go-containerregistry/pkg/authn/k8schain"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/sigstore/cosign/v2/pkg/cosign"
@@ -46,6 +47,8 @@ import (
 	"github.com/sigstore/policy-controller/pkg/apis/signaturealgo"
 	policycontrollerconfig "github.com/sigstore/policy-controller/pkg/config"
 	webhookcip "github.com/sigstore/policy-controller/pkg/webhook/clusterimagepolicy"
+	pbcommon "github.com/sigstore/protobuf-specs/gen/pb-go/common/v1"
+	"github.com/sigstore/sigstore-go/pkg/root"
 	"github.com/sigstore/sigstore/pkg/cryptoutils"
 	"github.com/sigstore/sigstore/pkg/fulcioroots"
 	"github.com/sigstore/sigstore/pkg/tuf"
@@ -1000,6 +1003,7 @@ func TestResolvePodSpec(t *testing.T) {
 	tag := name.MustParseReference("gcr.io/distroless/static:nonroot")
 	// Resolved via crane digest on 2021/09/25
 	digest := name.MustParseReference("gcr.io/distroless/static:nonroot@sha256:be5d77c62dbe7fedfb0a4e5ec2f91078080800ab1f18358e5f31fcc8faa023c4")
+	digestWithoutTag := name.MustParseReference("gcr.io/distroless/static@sha256:be5d77c62dbe7fedfb0a4e5ec2f91078080800ab1f18358e5f31fcc8faa023c4")
 
 	ctx, _ := rtesting.SetupFakeContext(t)
 
@@ -1017,7 +1021,7 @@ func TestResolvePodSpec(t *testing.T) {
 		remoteResolveDigest = rrd
 	}()
 	resolve := func(_ name.Reference, _ ...remote.Option) (name.Digest, error) {
-		return digest.(name.Digest), nil
+		return tag.Context().Digest(digestWithoutTag.Identifier()), nil
 	}
 
 	tests := []struct {
@@ -1103,6 +1107,30 @@ func TestResolvePodSpec(t *testing.T) {
 			Containers: []corev1.Container{{
 				Name:  "user-container",
 				Image: digest.String(),
+			}},
+		},
+		wc:  apis.WithinCreate,
+		rrd: resolve,
+	}, {
+		name: "digests without tag resolve (in create)",
+		ps: &corev1.PodSpec{
+			InitContainers: []corev1.Container{{
+				Name:  "setup-stuff",
+				Image: digestWithoutTag.String(),
+			}},
+			Containers: []corev1.Container{{
+				Name:  "user-container",
+				Image: digestWithoutTag.String(),
+			}},
+		},
+		want: &corev1.PodSpec{
+			InitContainers: []corev1.Container{{
+				Name:  "setup-stuff",
+				Image: digestWithoutTag.String(),
+			}},
+			Containers: []corev1.Container{{
+				Name:  "user-container",
+				Image: digestWithoutTag.String(),
 			}},
 		},
 		wc:  apis.WithinCreate,
@@ -3032,7 +3060,7 @@ func TestFulcioCertsFromAuthority(t *testing.T) {
 				} else if err.Error() != tc.wantErr {
 					t.Errorf("unexpected error: %v wanted %q", err, tc.wantErr)
 				}
-			} else if err == nil && tc.wantErr != "" {
+			} else if tc.wantErr != "" {
 				t.Errorf("wanted error: %q got none", tc.wantErr)
 			}
 			if !roots.Equal(tc.wantRoots) {
@@ -3140,7 +3168,7 @@ func TestRekorClientAndKeysFromAuthority(t *testing.T) {
 				} else if err.Error() != tc.wantErr {
 					t.Errorf("unexpected error: %v wanted %q", err, tc.wantErr)
 				}
-			} else if err == nil && tc.wantErr != "" {
+			} else if tc.wantErr != "" {
 				t.Errorf("wanted error: %q got none", tc.wantErr)
 			}
 			if tc.wantLogID != "" {
@@ -3240,10 +3268,12 @@ func TestCheckOptsFromAuthority(t *testing.T) {
 		}},
 	}
 	skCombined := config.SigstoreKeys{
+		MediaType: "application/vnd.dev.sigstore.trustedroot+json;version=0.1",
 		Tlogs: []*config.TransparencyLogInstance{{
-			PublicKey: pbpkRekor,
-			LogId:     &config.LogID{KeyId: []byte("rekor-logid")},
-			BaseUrl:   "rekor.example.com",
+			PublicKey:     pbpkRekor,
+			LogId:         &config.LogID{KeyId: []byte("rekor-logid")},
+			BaseUrl:       "rekor.example.com",
+			HashAlgorithm: pbcommon.HashAlgorithm_SHA2_256,
 		}},
 		CertificateAuthorities: []*config.CertificateAuthority{{
 			Subject: &config.DistinguishedName{
@@ -3253,8 +3283,9 @@ func TestCheckOptsFromAuthority(t *testing.T) {
 			CertChain: certChainPB,
 		}},
 		Ctlogs: []*config.TransparencyLogInstance{{
-			LogId:     &config.LogID{KeyId: []byte(ctfeLogID)},
-			PublicKey: pbpkCTFE,
+			LogId:         &config.LogID{KeyId: []byte(ctfeLogID)},
+			PublicKey:     pbpkCTFE,
+			HashAlgorithm: pbcommon.HashAlgorithm_SHA2_256,
 		}},
 	}
 	c := &config.Config{
@@ -3355,6 +3386,79 @@ func TestCheckOptsFromAuthority(t *testing.T) {
 			}},
 			CTLogPubKeys: &cosign.TrustedTransparencyLogPubKeys{Keys: map[string]cosign.TransparencyLogPubKey{ctfeLogID: {PubKey: pkCTFE, Status: tuf.Active}}},
 		},
+	}, {
+		name: "bundle format, with Identities and Rekor",
+		authority: webhookcip.Authority{
+			SignatureFormat: "bundle",
+			CTLog: &v1alpha1.TLog{
+				URL:          apis.HTTPS("rekor.example.com"),
+				TrustRootRef: "test-trust-combined",
+			},
+			Keyless: &webhookcip.KeylessRef{
+				TrustRootRef: "test-trust-combined",
+				Identities: []v1alpha1.Identity{{
+					Issuer:  "issuer",
+					Subject: "subject",
+				}},
+			},
+		},
+		ctx: testCtx,
+		wantCheckOpts: &cosign.CheckOpts{
+			NewBundleFormat: true,
+			Identities: []cosign.Identity{{
+				Issuer:  "issuer",
+				Subject: "subject",
+			}},
+			TrustedMaterial: &root.TrustedRoot{},
+		},
+	}, {
+		name: "bundle format, with TSA",
+		authority: webhookcip.Authority{
+			SignatureFormat: "bundle",
+			// Test keys do not contain a TSA but that is okay as we are just constructing the checkOpts
+			RFC3161Timestamp: &webhookcip.RFC3161Timestamp{
+				TrustRootRef: "test-trust-combined",
+			},
+			Keyless: &webhookcip.KeylessRef{
+				TrustRootRef: "test-trust-combined",
+			},
+		},
+		ctx: testCtx,
+		wantCheckOpts: &cosign.CheckOpts{
+			NewBundleFormat:     true,
+			UseSignedTimestamps: true,
+			TrustedMaterial:     &root.TrustedRoot{},
+		},
+	}, {
+		name: "bundle format, bad TrustRootRef",
+		authority: webhookcip.Authority{
+			SignatureFormat: "bundle",
+			Keyless: &webhookcip.KeylessRef{
+				TrustRootRef: "not-there",
+			},
+		},
+		ctx:     testCtx,
+		wantErr: "trustRootRef not-there not found",
+	}, {
+		name: "bundle format, unsupported different trustroots",
+		authority: webhookcip.Authority{
+			SignatureFormat: "bundle",
+			CTLog: &v1alpha1.TLog{
+				TrustRootRef: "test-trust-rekor",
+			},
+			Keyless: &webhookcip.KeylessRef{
+				TrustRootRef: "test-trust-combined",
+			},
+		},
+		ctx:     testCtx,
+		wantErr: "when using the new bundle format, the trustRootRef for the TLog must be the same as the trustRootRef for the Keyless authority",
+	}, {
+		name: "bundle format, unsupported non-keyless",
+		authority: webhookcip.Authority{
+			SignatureFormat: "bundle",
+		},
+		ctx:     testCtx,
+		wantErr: "when using the new bundle format, the authority must be keyless",
 	}}
 
 	for _, tc := range tests {
@@ -3370,7 +3474,7 @@ func TestCheckOptsFromAuthority(t *testing.T) {
 				} else if err.Error() != tc.wantErr {
 					t.Errorf("unexpected error: %v wanted %q", err, tc.wantErr)
 				}
-			} else if err == nil && tc.wantErr != "" {
+			} else if tc.wantErr != "" {
 				t.Errorf("wanted error: %q got none", tc.wantErr)
 			}
 			if tc.wantClient && (gotCheckOpts == nil || gotCheckOpts.RekorClient == nil) {
@@ -3384,7 +3488,7 @@ func TestCheckOptsFromAuthority(t *testing.T) {
 			if gotCheckOpts != nil {
 				gotCheckOpts.RekorClient = nil
 			}
-			if diff := cmp.Diff(gotCheckOpts, tc.wantCheckOpts); diff != "" {
+			if diff := cmp.Diff(gotCheckOpts, tc.wantCheckOpts, cmpopts.IgnoreUnexported(root.TrustedRoot{})); diff != "" {
 				t.Errorf("CheckOpts differ: %s", diff)
 			}
 		})
