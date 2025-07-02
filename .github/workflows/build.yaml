@@ -26,6 +26,8 @@ permissions: {}
 jobs:
   build:
     name: build
+    # RHTAS: skip because it invloves auth with google
+    if: github.repository == 'sigstore/policy-controller'
     runs-on: ubuntu-latest
 
     permissions:
