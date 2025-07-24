@@ -26,6 +26,7 @@ permissions: read-all
 jobs:
   verify:
     name: Verify codegen
+    if: github.repository == 'sigstore/policy-controller'
     runs-on: ubuntu-latest
 
     env:
