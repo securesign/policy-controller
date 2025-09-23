@@ -29,6 +29,7 @@ LABEL io.k8s.display-name="policy-controller container image for Red Hat Trusted
 LABEL io.openshift.tags="policy-controller trusted-signer trusted-artifact-signer"
 LABEL summary="Provides the policy-controller admission controller for enforcing policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
 LABEL com.redhat.component="policy-controller"
-LABEL name="policy-controller"
+LABEL name="rhtas/policy-controller-rhel9"
+LABEL cpe="cpe:/a:redhat:trusted_artifact_signer:1.3.0::el9"
 
 ENTRYPOINT [ "policy-controller" ]
