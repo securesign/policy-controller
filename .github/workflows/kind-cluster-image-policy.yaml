@@ -33,10 +33,10 @@ jobs:
       fail-fast: false # Keep running if one leg fails.
       matrix:
         k8s-version:
-          - v1.30.x
           - v1.31.x
           - v1.32.x
           - v1.33.x
+          - v1.34.x
 
         script:
         - cluster_image_policy
@@ -54,7 +54,7 @@ jobs:
 
     env:
       KO_DOCKER_REPO: "registry.local:5000/policy-controller"
-      SCAFFOLDING_RELEASE_VERSION: "v0.7.24"
+      SCAFFOLDING_RELEASE_VERSION: "v0.7.27"
       GO111MODULE: on
       GOFLAGS: -ldflags=-s -ldflags=-w
       KOCACHE: ~/ko
@@ -108,7 +108,7 @@ jobs:
           apt-get remove -y 'php.*' || true
           apt-get autoremove -y >/dev/null 2>&1 || true
           apt-get autoclean -y >/dev/null 2>&1 || true
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
       with:
         go-version-file: './go.mod'
@@ -120,14 +120,14 @@ jobs:
     - uses: imranismail/setup-kustomize@2ba527d4d055ab63514ba50a99456fc35684947f # v2.1.0
 
     - name: Install yq
-      uses: mikefarah/yq@b534aa9ee5d38001fba3cd8fe254a037e4847b37 # v4.45.4
+      uses: mikefarah/yq@45be35c06387d692bb6bf689919919e0e32e796f # v4.49.1
 
     - name: Setup mirror
-      uses: chainguard-dev/actions/setup-mirror@16e2fd6603a1c6a1fbc880fdbb922b2e8e2be3e7 # v1.4.3
+      uses: chainguard-dev/actions/setup-mirror@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d # v1.5.10
       with:
         mirror: mirror.gcr.io
 
-    - uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac
+    - uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159
 
     - name: Install cluster + sigstore
       uses: sigstore/scaffolding/actions/setup@main
@@ -174,4 +174,4 @@ jobs:
 
     - name: Collect diagnostics
       if: ${{ failure() }}
-      uses: chainguard-dev/actions/kind-diag@16e2fd6603a1c6a1fbc880fdbb922b2e8e2be3e7 # v1.4.3
+      uses: chainguard-dev/actions/kind-diag@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d # v1.5.10
