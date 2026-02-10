@@ -8,13 +8,13 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "main"
+      == "tech-preview"
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: policy-controller
-    appstudio.openshift.io/component: policy-controller
+    appstudio.openshift.io/application: policy-controller-tech-preview
+    appstudio.openshift.io/component: policy-controller-tech-preview
     pipelines.appstudio.openshift.io/type: build
-  name: policy-controller-on-push
+  name: policy-controller-tech-preview-on-push
   namespace: rhtas-tenant
 spec:
   params:
@@ -42,7 +42,7 @@ spec:
       value: pipelines/docker-build-oci-ta.yaml
     resolver: git
   taskRunTemplate:
-    serviceAccountName: build-pipeline-policy-controller
+    serviceAccountName: build-pipeline-policy-controller-tech-preview
   workspaces:
   - name: git-auth
     secret:
