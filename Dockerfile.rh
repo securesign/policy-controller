@@ -1,5 +1,5 @@
 # Build stage
-FROM registry.redhat.io/ubi9/go-toolset:9.6@sha256:7b1828de52c3bac600a71b81996bf748776a456181a45e2b329b39702cf6486f AS build-env
+FROM registry.redhat.io/ubi9/go-toolset:9.7@sha256:82b82ecf4aedf67c4369849047c2680dba755fe57547bbb05eca211b22038e29 AS build-env
 WORKDIR /opt/app-root/src/
 USER root
 ENV GOEXPERIMENT=strictfipsruntime
@@ -17,7 +17,7 @@ RUN CGO_ENABLED=1 go build -mod=mod \
     -o ./policy-controller ./cmd/webhook
 
 # Install stage
-FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:34880b64c07f28f64d95737f82f891516de9a3b43583f39970f7bf8e4cfa48b7
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:759f5f42d9d6ce2a705e290b7fc549e2d2cd39312c4fa345f93c02e4abb8da95
 COPY --from=build-env /opt/app-root/src/policy-controller /usr/local/bin/policy-controller
 WORKDIR /opt/app-root/src/home
 COPY LICENSE /licenses/LICENSE
