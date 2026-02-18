@@ -1,8 +1,6 @@
 module github.com/sigstore/policy-controller
 
-go 1.24.0
-
-toolchain go1.24.5
+go 1.24.6
 
 require (
 	github.com/aws/aws-sdk-go v1.55.7
@@ -38,7 +36,7 @@ require (
 	golang.org/x/net v0.46.0
 	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/time v0.14.0
-	google.golang.org/grpc v1.75.1 // indirect
+	google.golang.org/grpc v1.76.0 // indirect
 	google.golang.org/protobuf v1.36.10
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.34.1
@@ -49,7 +47,6 @@ require (
 	knative.dev/hack v0.0.0-20251021013703-4fae78067103
 	sigs.k8s.io/release-utils v0.12.2
 	sigs.k8s.io/yaml v1.6.0
-
 )
 
 require github.com/spf13/cobra v1.10.1
@@ -74,7 +71,6 @@ require (
 	github.com/spf13/viper v1.21.0
 	knative.dev/hack/schema v0.0.0-20251021013703-4fae78067103
 	knative.dev/pkg v0.0.0-20251021013446-a1339c6a6898
-
 )
 
 require (
@@ -84,7 +80,7 @@ require (
 )
 
 require (
-	cel.dev/expr v0.24.0 // indirect
+	cel.dev/expr v0.25.1 // indirect
 	cloud.google.com/go v0.123.0 // indirect
 	cloud.google.com/go/auth v0.17.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
@@ -156,7 +152,7 @@ require (
 	github.com/chrismellard/docker-credential-acr-env v0.0.0-20230304212654-82a0ddb27589 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
 	github.com/cloudflare/circl v1.6.1 // indirect
-	github.com/cncf/xds/go v0.0.0-20251014123835-2ee22ca58382 // indirect
+	github.com/cncf/xds/go v0.0.0-20260202195803-dba9d589def2 // indirect
 	github.com/cockroachdb/apd/v3 v3.2.1 // indirect
 	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
@@ -174,7 +170,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4 // indirect
-	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
+	github.com/envoyproxy/protoc-gen-validate v1.3.0 // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
