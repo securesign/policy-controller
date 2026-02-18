@@ -49,7 +49,6 @@ require (
 	knative.dev/hack v0.0.0-20251021013703-4fae78067103
 	sigs.k8s.io/release-utils v0.12.2
 	sigs.k8s.io/yaml v1.6.0
-
 )
 
 require github.com/spf13/cobra v1.10.1
@@ -74,13 +73,12 @@ require (
 	github.com/spf13/viper v1.21.0
 	knative.dev/hack/schema v0.0.0-20251021013703-4fae78067103
 	knative.dev/pkg v0.0.0-20251021013446-a1339c6a6898
-
 )
 
 require (
 	github.com/emicklei/proto v1.14.2 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/protocolbuffers/txtpbfmt v0.0.0-20250627152318-f293424e46b5 // indirect
+	github.com/protocolbuffers/txtpbfmt v0.0.0-20260217160748-a481f6a22f94 // indirect
 )
 
 require (

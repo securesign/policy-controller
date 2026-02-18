@@ -1426,8 +1426,8 @@ github.com/prometheus/otlptranslator v1.0.0 h1:s0LJW/iN9dkIH+EnhiD3BlkkP5QVIUVEo
 github.com/prometheus/otlptranslator v1.0.0/go.mod h1:vRYWnXvI6aWGpsdY/mOT/cbeVRBlPWtBNDb7kGR3uKM=
 github.com/prometheus/procfs v0.17.0 h1:FuLQ+05u4ZI+SS/w9+BWEM2TXiHKsUQ9TADiRH7DuK0=
 github.com/prometheus/procfs v0.17.0/go.mod h1:oPQLaDAMRbA+u8H5Pbfq+dl3VDAvHxMUOVhe0wYB2zw=
-github.com/protocolbuffers/txtpbfmt v0.0.0-20250627152318-f293424e46b5 h1:WWs1ZFnGobK5ZXNu+N9If+8PDNVB9xAqrib/stUXsV4=
-github.com/protocolbuffers/txtpbfmt v0.0.0-20250627152318-f293424e46b5/go.mod h1:BnHogPTyzYAReeQLZrOxyxzS739DaTNtTvohVdbENmA=
+github.com/protocolbuffers/txtpbfmt v0.0.0-20260217160748-a481f6a22f94 h1:2PC6Ql3jipz1KvBlqUHjjk6v4aMwE86mfDu1XMH0LR8=
+github.com/protocolbuffers/txtpbfmt v0.0.0-20260217160748-a481f6a22f94/go.mod h1:JSbkp0BviKovYYt9XunS95M3mLPibE9bGg+Y95DsEEY=
 github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9 h1:bsUq1dX0N8AOIL7EB/X911+m4EHsnWEHeJ0c+3TTBrg=
 github.com/rcrowley/go-metrics v0.0.0-20250401214520-65e299d6c5c9/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
