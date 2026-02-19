@@ -34,12 +34,12 @@ require (
 	github.com/theupdateframework/go-tuf v0.7.0
 	github.com/titanous/rocacheck v0.0.0-20171023193734-afe73141d399
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.43.0
-	golang.org/x/net v0.46.0
-	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/crypto v0.44.0
+	golang.org/x/net v0.47.0
+	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/time v0.14.0
 	google.golang.org/grpc v1.75.1 // indirect
-	google.golang.org/protobuf v1.36.10
+	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.34.1
@@ -49,7 +49,6 @@ require (
 	knative.dev/hack v0.0.0-20251021013703-4fae78067103
 	sigs.k8s.io/release-utils v0.12.2
 	sigs.k8s.io/yaml v1.6.0
-
 )
 
 require github.com/spf13/cobra v1.10.1
@@ -74,7 +73,6 @@ require (
 	github.com/spf13/viper v1.21.0
 	knative.dev/hack/schema v0.0.0-20251021013703-4fae78067103
 	knative.dev/pkg v0.0.0-20251021013446-a1339c6a6898
-
 )
 
 require (
@@ -84,7 +82,7 @@ require (
 )
 
 require (
-	cel.dev/expr v0.24.0 // indirect
+	cel.dev/expr v0.25.1 // indirect
 	cloud.google.com/go v0.123.0 // indirect
 	cloud.google.com/go/auth v0.17.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
@@ -215,7 +213,7 @@ require (
 	github.com/google/certificate-transparency-go v1.3.2 // indirect
 	github.com/google/gnostic-models v0.7.0 // indirect
 	github.com/google/go-github/v55 v55.0.0 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
@@ -281,7 +279,7 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/yashtewari/glob-intersection v0.2.0 // indirect
 	github.com/zeebo/errs v1.4.0 // indirect
-	gitlab.com/gitlab-org/api/client-go v0.157.0 // indirect
+	gitlab.com/gitlab-org/api/client-go v1.23.0 // indirect
 	go.mongodb.org/mongo-driver v1.17.4 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
@@ -307,12 +305,12 @@ require (
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/exp v0.0.0-20251017212417-90e834f514db // indirect
-	golang.org/x/mod v0.29.0 // indirect
-	golang.org/x/oauth2 v0.32.0 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/term v0.36.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
-	golang.org/x/tools v0.38.0 // indirect
+	golang.org/x/mod v0.30.0 // indirect
+	golang.org/x/oauth2 v0.34.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/term v0.37.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/tools v0.39.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
 	google.golang.org/api v0.252.0 // indirect
 	google.golang.org/genproto v0.0.0-20251020155222-88f65dc88635 // indirect
