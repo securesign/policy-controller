@@ -32,6 +32,10 @@ spec:
     value: '{"type": "gomod", "path": "."}'
   - name: hermetic
     value: "true"
+  - name: image-version
+    value: "1.0.0"
+  - name: release-version
+    value: "1.4.0"
   pipelineRef:
     params:
     - name: url
