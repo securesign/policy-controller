@@ -7,9 +7,9 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.41.4 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/go-cmp v0.7.0
-	github.com/google/go-containerregistry v0.21.1
-	github.com/google/go-containerregistry/pkg/authn/k8schain v0.0.0-20260224031529-85f2bf5f7303
-	github.com/google/go-containerregistry/pkg/authn/kubernetes v0.0.0-20260224031529-85f2bf5f7303
+	github.com/google/go-containerregistry v0.21.3
+	github.com/google/go-containerregistry/pkg/authn/k8schain bf0f7103d474
+	github.com/google/go-containerregistry/pkg/authn/kubernetes bf0f7103d474
 	github.com/hashicorp/errwrap v1.1.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-multierror v1.1.1
@@ -21,12 +21,12 @@ require (
 	github.com/hashicorp/golang-lru v1.0.2
 	github.com/hashicorp/hcl v1.0.1-vault-7
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/letsencrypt/boulder v0.20260317.0
+	github.com/letsencrypt/boulder v0.20260324.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c
 	github.com/ryanuber/go-glob v1.0.0
 	github.com/sigstore/cosign/v2 v2.5.0
-	github.com/sigstore/rekor v1.5.0
+	github.com/sigstore/rekor v1.5.1
 	github.com/sigstore/sigstore v1.10.4
 	github.com/stretchr/testify v1.11.1
 	github.com/theupdateframework/go-tuf v0.7.0
@@ -62,7 +62,7 @@ require (
 	github.com/docker/go-connections v0.6.0
 	github.com/go-jose/go-jose/v4 v4.1.3
 	github.com/sigstore/protobuf-specs v0.5.0
-	github.com/sigstore/scaffolding v0.7.22
+	github.com/sigstore/scaffolding v0.7.33
 	github.com/sigstore/sigstore-go v1.1.4
 	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.4
 	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.4
@@ -104,7 +104,7 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.4.1 // indirect
-	github.com/ThalesIgnite/crypto11 v1.2.5 // indirect
+	github.com/ThalesIgnite/crypto11 v1.6.0 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.5 // indirect
 	github.com/alibabacloud-go/cr-20160607 v1.0.1 // indirect
@@ -304,7 +304,7 @@ require (
 	golang.org/x/text v0.35.0 // indirect
 	golang.org/x/tools v0.43.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
-	google.golang.org/api v0.272.0 // indirect
+	google.golang.org/api v0.273.0 // indirect
 	google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260319201613-d00831a3d3e7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260319201613-d00831a3d3e7 // indirect
