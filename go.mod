@@ -26,7 +26,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c
 	github.com/ryanuber/go-glob v1.0.0
 	github.com/sigstore/cosign/v2 v2.5.0
-	github.com/sigstore/rekor v1.5.1
+	github.com/sigstore/rekor v1.4.3
 	github.com/sigstore/sigstore v1.10.5
 	github.com/stretchr/testify v1.11.1
 	github.com/theupdateframework/go-tuf v0.7.0
@@ -62,7 +62,7 @@ require (
 	github.com/docker/go-connections v0.6.0
 	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/sigstore/protobuf-specs v0.5.1
-	github.com/sigstore/scaffolding v0.7.33
+	github.com/sigstore/scaffolding v0.7.22
 	github.com/sigstore/sigstore-go v1.1.4
 	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.5
 	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.5
@@ -104,7 +104,7 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.4.1 // indirect
-	github.com/ThalesIgnite/crypto11 v1.6.0 // indirect
+	github.com/ThalesIgnite/crypto11 v1.2.5 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.5 // indirect
 	github.com/alibabacloud-go/cr-20160607 v1.0.1 // indirect
@@ -158,7 +158,6 @@ require (
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v29.3.1+incompatible // indirect
-	github.com/docker/distribution v2.8.3+incompatible // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
@@ -225,9 +224,10 @@ require (
 	github.com/lestrrat-go/option/v2 v2.0.0 // indirect
 	github.com/miekg/pkcs11 v1.1.2 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
-	github.com/moby/sys/sequential v0.6.0 // indirect
+	github.com/moby/sys/atomicwriter v0.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
+	github.com/morikuni/aec v1.1.0 // indirect
 	github.com/mozillazg/docker-credential-acr-helper v0.4.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
@@ -312,7 +312,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.1 // indirect
 	k8s.io/apiextensions-apiserver v0.35.3 // indirect
-	k8s.io/gengo/v2 25e2208e0dc3 // indirect
+	k8s.io/gengo/v2 v2.0.0-20260408192533-25e2208e0dc3 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5 // indirect
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 // indirect
