@@ -8,8 +8,8 @@ require (
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-containerregistry v0.21.5
-	github.com/google/go-containerregistry/pkg/authn/k8schain v0.0.0-20260421225946-d4f10504a3c9
-	github.com/google/go-containerregistry/pkg/authn/kubernetes v0.0.0-20260421225946-d4f10504a3c9
+	github.com/google/go-containerregistry/pkg/authn/k8schain 611d67577a05
+	github.com/google/go-containerregistry/pkg/authn/kubernetes 611d67577a05
 	github.com/hashicorp/errwrap v1.1.0
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-multierror v1.1.1
@@ -21,12 +21,12 @@ require (
 	github.com/hashicorp/golang-lru v1.0.2
 	github.com/hashicorp/hcl v1.0.1-vault-7
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/letsencrypt/boulder v0.20260420.0
+	github.com/letsencrypt/boulder v0.20260428.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c
 	github.com/ryanuber/go-glob v1.0.0
 	github.com/sigstore/cosign/v2 v2.5.0
-	github.com/sigstore/rekor v1.5.0
+	github.com/sigstore/rekor v1.5.1
 	github.com/sigstore/sigstore v1.10.5
 	github.com/stretchr/testify v1.11.1
 	github.com/theupdateframework/go-tuf v0.7.0
@@ -40,11 +40,11 @@ require (
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.35.4
-	k8s.io/apimachinery v0.35.4
-	k8s.io/client-go v0.35.4
-	k8s.io/code-generator v0.35.4
-	k8s.io/kube-openapi v0.0.0-20260414162039-ec9c827d403f
-	knative.dev/hack v0.0.0-20260421155212-aeb7b4a9bf96
+	k8s.io/apimachinery v0.36.0
+	k8s.io/client-go v0.36.0
+	k8s.io/code-generator v0.36.0
+	k8s.io/kube-openapi 8949caaa1199
+	knative.dev/hack b2a37f1b6e7b
 	sigs.k8s.io/release-utils v0.12.4
 	sigs.k8s.io/yaml v1.6.0
 )
@@ -62,15 +62,15 @@ require (
 	github.com/docker/go-connections v0.7.0
 	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/sigstore/protobuf-specs v0.5.1
-	github.com/sigstore/scaffolding v0.7.22
+	github.com/sigstore/scaffolding v0.7.33
 	github.com/sigstore/sigstore-go v1.1.4
 	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.5
 	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.5
 	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.10.5
 	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.10.5
 	github.com/spf13/viper v1.21.0
-	knative.dev/hack/schema v0.0.0-20260421155212-aeb7b4a9bf96
-	knative.dev/pkg v0.0.0-20260422015212-ec452872dcc1
+	knative.dev/hack/schema b2a37f1b6e7b
+	knative.dev/pkg 1614daceb7f2
 )
 
 require (
@@ -105,7 +105,7 @@ require (
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.7.1 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.4.1 // indirect
-	github.com/ThalesIgnite/crypto11 v1.2.5 // indirect
+	github.com/ThalesIgnite/crypto11 v1.6.0 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
 	github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.5 // indirect
 	github.com/alibabacloud-go/cr-20160607 v1.0.1 // indirect
@@ -271,7 +271,7 @@ require (
 	github.com/transparency-dev/formats v0.1.0 // indirect
 	github.com/transparency-dev/merkle v0.0.2 // indirect
 	github.com/valyala/fastjson v1.6.10 // indirect
-	github.com/vbatts/tar-split v0.12.2 // indirect
+	github.com/vbatts/tar-split v0.12.3 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.32 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
@@ -308,13 +308,13 @@ require (
 	golang.org/x/tools v0.44.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
 	google.golang.org/api v0.276.0 // indirect
-	google.golang.org/genproto v0.0.0-20260420184626-e10c466a9529 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20260420184626-e10c466a9529 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
+	google.golang.org/genproto 7cedc36a6bc4 // indirect
+	google.golang.org/genproto/googleapis/api 7cedc36a6bc4 // indirect
+	google.golang.org/genproto/googleapis/rpc 7cedc36a6bc4 // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.1 // indirect
-	k8s.io/apiextensions-apiserver v0.35.4 // indirect
+	k8s.io/apiextensions-apiserver v0.36.0 // indirect
 	k8s.io/gengo/v2 v2.0.0-20260408192533-25e2208e0dc3 // indirect
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/utils v0.0.0-20260319190234-28399d86e0b5 // indirect
@@ -329,6 +329,6 @@ replace github.com/golang/glog => github.com/jdolitsky/glog v0.0.0-2021082011531
 
 replace (
 	// knative deps require to use an old k8s.io/gengo so we need to replace these ones
-	k8s.io/code-generator => k8s.io/code-generator v0.35.4
-	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20260414162039-ec9c827d403f
+	k8s.io/code-generator => k8s.io/code-generator v0.36.0
+	k8s.io/kube-openapi => k8s.io/kube-openapi 8949caaa1199
 )
