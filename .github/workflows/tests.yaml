@@ -60,6 +60,7 @@ jobs:
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           env_vars: OS
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Run Go tests w/ `-race`
         if: ${{ runner.os == 'Linux' }}
         run: go test -race $(go list ./... | grep -v third_party/)
