@@ -86,7 +86,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	cloud.google.com/go/iam v1.10.0 // indirect
 	cloud.google.com/go/kms v1.30.0 // indirect
-	cloud.google.com/go/longrunning v0.12.0 // indirect
+	cloud.google.com/go/longrunning v1.0.0 // indirect
 	cuelang.org/go v0.16.1 // indirect
 	github.com/AliyunContainerService/ack-ram-tool/pkg/credentials/provider v0.20.0 // indirect
 	github.com/AliyunContainerService/ack-ram-tool/pkg/ecsmetadata v0.0.10 // indirect
