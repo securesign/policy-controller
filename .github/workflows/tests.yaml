@@ -26,6 +26,7 @@ jobs:
   unit-tests:
     name: Run unit tests
     permissions:
+      id-token: write
       contents: read
     runs-on: ${{ matrix.os }}
     strategy:
@@ -60,6 +61,8 @@ jobs:
         uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
         with:
           env_vars: OS
+          use_oidc: true
+          flags: unit
       - name: Run Go tests w/ `-race`
         if: ${{ runner.os == 'Linux' }}
         run: go test -race $(go list ./... | grep -v third_party/)
