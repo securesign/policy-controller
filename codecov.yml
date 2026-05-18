@@ -14,11 +14,16 @@
 
 coverage:
   status:
-    patch:
-      default:
-        target: 70%
-        threshold: 5%
     project:
       default:
         target: auto
         informational: true
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+        informational: true
+
+flag_management:
+  default_rules:
+    carryforward: true
