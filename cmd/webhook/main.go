@@ -106,7 +106,7 @@ var (
 )
 
 func main() {
-	opts := webhook.Options{
+	opts := webhook.Options{ //nolint:gosec // G101 false positive - SecretName is a k8s resource name, not a credential
 		ServiceName: "webhook",
 		Port:        8443,
 		SecretName:  "webhook-certs",
