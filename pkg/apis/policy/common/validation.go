@@ -21,7 +21,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/aws/aws-sdk-go/aws/arn"
+	"github.com/aws/aws-sdk-go/aws/arn" //nolint:staticcheck // SA1019 - matches upstream, will be replaced when upstream migrates to aws-sdk-go-v2
 	registryfuncs "github.com/google/go-containerregistry/pkg/name"
 	"github.com/sigstore/sigstore/pkg/signature/kms/aws"
 	"github.com/sigstore/sigstore/pkg/signature/kms/azure"
