@@ -52,6 +52,9 @@ SRCS = $(shell find cmd -iname "*.go") $(shell find pkg -iname "*.go")
 GOLANGCI_LINT_DIR = $(shell pwd)/bin
 GOLANGCI_LINT_BIN = $(GOLANGCI_LINT_DIR)/golangci-lint
 
+CONTAINER_TOOL ?= docker
+IMG ?= policy-controller:latest
+
 KO_PREFIX ?= gcr.io/projectsigstore
 export KO_DOCKER_REPO=$(KO_PREFIX)
 GHCR_PREFIX ?= ghcr.io/sigstore/policy-controller
@@ -87,6 +90,10 @@ fmt: ## Format all go files
 .PHONY: policy-controller
 policy-controller:
 	CGO_ENABLED=0 go build -trimpath -ldflags "$(LDFLAGS)" -o $@ ./cmd/webhook
+
+.PHONY: docker-build-coverage
+docker-build-coverage: ## Build coverage-instrumented docker image for E2E coverage collection.
+	$(CONTAINER_TOOL) build -f Dockerfile.coverage -t $(IMG)-coverage .
 
 ## Build policy-tester binary
 .PHONY: policy-tester

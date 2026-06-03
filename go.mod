@@ -60,6 +60,7 @@ require (
 	github.com/go-jose/go-jose/v4 v4.1.4
 	github.com/hashicorp/golang-lru v1.0.2
 	github.com/hashicorp/hcl v1.0.1-vault-7
+	github.com/konflux-ci/coverport/instrumentation/go v0.0.0-20260602122146-bec753b4d12f
 	github.com/sigstore/cosign/v2 v2.4.3
 	github.com/sigstore/protobuf-specs v0.5.1
 	github.com/sigstore/scaffolding v0.7.22
