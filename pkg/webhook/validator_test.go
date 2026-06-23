@@ -25,6 +25,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -36,11 +37,13 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/google/go-containerregistry/pkg/authn/k8schain"
 	"github.com/google/go-containerregistry/pkg/name"
-	"github.com/sigstore/cosign/v2/pkg/cosign"
-	"github.com/sigstore/cosign/v2/pkg/cosign/bundle"
-	"github.com/sigstore/cosign/v2/pkg/oci"
-	"github.com/sigstore/cosign/v2/pkg/oci/remote"
-	"github.com/sigstore/cosign/v2/pkg/oci/static"
+	v1 "github.com/google/go-containerregistry/pkg/v1"
+	v1types "github.com/google/go-containerregistry/pkg/v1/types"
+	"github.com/sigstore/cosign/v3/pkg/cosign"
+	"github.com/sigstore/cosign/v3/pkg/cosign/bundle"
+	"github.com/sigstore/cosign/v3/pkg/oci"
+	"github.com/sigstore/cosign/v3/pkg/oci/remote"
+	"github.com/sigstore/cosign/v3/pkg/oci/static"
 	"github.com/sigstore/policy-controller/pkg/apis/config"
 	policyduckv1beta1 "github.com/sigstore/policy-controller/pkg/apis/duck/v1beta1"
 	"github.com/sigstore/policy-controller/pkg/apis/policy/v1alpha1"
@@ -1584,7 +1587,7 @@ func TestValidatePolicy(t *testing.T) {
 		return []oci.Signature{sig}, true, nil
 	}
 	// Let's just say that everything is verified.
-	passKeyless := func(_ context.Context, _ name.Reference, _ *cosign.CheckOpts) (checkedSignatures []oci.Signature, bundleVerified bool, err error) {
+	passKeyless := func(_ context.Context, _ name.Reference, _ *cosign.CheckOpts, _ ...name.Option) (checkedSignatures []oci.Signature, bundleVerified bool, err error) {
 		// This is from 2022/07/29
 		// ghcr.io/distroless/static@sha256:a1e82f6a5f6dfc735165d3442e7cc5a615f72abac3db19452481f5f3c90fbfa8
 		payload := []byte(`{"payloadType":"application/vnd.in-toto+json","payload":"eyJfdHlwZSI6Imh0dHBzOi8vaW4tdG90by5pby9TdGF0ZW1lbnQvdjAuMSIsInByZWRpY2F0ZVR5cGUiOiJodHRwczovL2Nvc2lnbi5zaWdzdG9yZS5kZXYvYXR0ZXN0YXRpb24vdnVsbi92MSIsInN1YmplY3QiOlt7Im5hbWUiOiJnaGNyLmlvL2Rpc3Ryb2xlc3Mvc3RhdGljIiwiZGlnZXN0Ijp7InNoYTI1NiI6ImExZTgyZjZhNWY2ZGZjNzM1MTY1ZDM0NDJlN2NjNWE2MTVmNzJhYmFjM2RiMTk0NTI0ODFmNWYzYzkwZmJmYTgifX1dLCJwcmVkaWNhdGUiOnsiaW52b2NhdGlvbiI6eyJwYXJhbWV0ZXJzIjpudWxsLCJ1cmkiOiJodHRwczovL2dpdGh1Yi5jb20vZGlzdHJvbGVzcy9zdGF0aWMvYWN0aW9ucy9ydW5zLzI3NTc5NTMxMzkiLCJldmVudF9pZCI6IjI3NTc5NTMxMzkiLCJidWlsZGVyLmlkIjoiQ3JlYXRlIFJlbGVhc2UifSwic2Nhbm5lciI6eyJ1cmkiOiJodHRwczovL2dpdGh1Yi5jb20vYXF1YXNlY3VyaXR5L3RyaXZ5IiwidmVyc2lvbiI6IjAuMjkuMiIsImRiIjp7InVyaSI6IiIsInZlcnNpb24iOiIifSwicmVzdWx0Ijp7IiRzY2hlbWEiOiJodHRwczovL2pzb24uc2NoZW1hc3RvcmUub3JnL3NhcmlmLTIuMS4wLXJ0bS41Lmpzb24iLCJydW5zIjpbeyJjb2x1bW5LaW5kIjoidXRmMTZDb2RlVW5pdHMiLCJvcmlnaW5hbFVyaUJhc2VJZHMiOnsiUk9PVFBBVEgiOnsidXJpIjoiZmlsZTovLy8ifX0sInJlc3VsdHMiOltdLCJ0b29sIjp7ImRyaXZlciI6eyJmdWxsTmFtZSI6IlRyaXZ5IFZ1bG5lcmFiaWxpdHkgU2Nhbm5lciIsImluZm9ybWF0aW9uVXJpIjoiaHR0cHM6Ly9naXRodWIuY29tL2FxdWFzZWN1cml0eS90cml2eSIsIm5hbWUiOiJUcml2eSIsInJ1bGVzIjpbXSwidmVyc2lvbiI6IjAuMjkuMiJ9fX1dLCJ2ZXJzaW9uIjoiMi4xLjAifX0sIm1ldGFkYXRhIjp7InNjYW5TdGFydGVkT24iOiIyMDIyLTA3LTI5VDAyOjI4OjQyWiIsInNjYW5GaW5pc2hlZE9uIjoiMjAyMi0wNy0yOVQwMjoyODo0OFoifX19","signatures":[{"keyid":"","sig":"MEYCIQDeQXMMojIpNvxEDLDXUC5aAwCbPPr/0uckP8TCcdTLjgIhAJG6M00kY40bz/C90W0FeUc2YcWY+txD4BPXhzd8E+tP"}]}`)
@@ -1646,7 +1649,7 @@ func TestValidatePolicy(t *testing.T) {
 		policy        webhookcip.ClusterImagePolicy
 		want          *PolicyResult
 		wantErrs      []string
-		cva           func(context.Context, name.Reference, *cosign.CheckOpts) ([]oci.Signature, bool, error)
+		cva           func(context.Context, name.Reference, *cosign.CheckOpts, ...name.Option) ([]oci.Signature, bool, error)
 		cvs           func(context.Context, name.Reference, *cosign.CheckOpts) ([]oci.Signature, bool, error)
 		customContext context.Context
 	}{{
@@ -3545,4 +3548,689 @@ func newStaticSig(t *testing.T, payload []byte, cert []byte) oci.Signature {
 		t.Fatal(err)
 	}
 	return out
+}
+
+// TODO: This test needs a more realistic DSSE envelope mock
+func TestValidAttestationsOCI11Enabled_DISABLED(t *testing.T) {
+	t.Skip("Skipping until DSSE envelope mocking is improved")
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save originals
+	origResolve := ociremoteResolveDigest
+	origReferrers := ociremoteReferrers
+	origVerifyAtt := cosignVerifyAttestations
+	defer func() {
+		ociremoteResolveDigest = origResolve
+		ociremoteReferrers = origReferrers
+		cosignVerifyAttestations = origVerifyAtt
+	}()
+
+	// Test with EnableOCI11 = true
+	cfg := &policycontrollerconfig.PolicyControllerConfig{
+		EnableOCI11: true,
+	}
+	ctx = policycontrollerconfig.ToContext(ctx, cfg)
+
+	// Mock successful OCI 1.1 discovery
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		return name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234").(name.Digest), nil
+	}
+
+	mockManifest := &v1.IndexManifest{
+		Manifests: []v1.Descriptor{
+			{
+				ArtifactType: "application/vnd.in-toto+json",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "attestationdigest",
+				},
+			},
+		},
+	}
+
+	ociremoteReferrers = func(d name.Digest, artifactType string, opts ...remote.Option) (*v1.IndexManifest, error) {
+		return mockManifest, nil
+	}
+
+	// Create a mock signed image with DSSE envelope
+	dsseContent := []byte(`{"payload":"eyJmb28iOiJiYXIifQ==","signatures":[{"sig":"c2lnbmF0dXJl"}]}`)
+
+	ociremoteSignedImage = func(ref name.Reference, opts ...remote.Option) (oci.SignedImage, error) {
+		return &mockSignedImage{
+			layers: []v1.Layer{
+				&mockLayer{content: dsseContent},
+			},
+		}, nil
+	}
+
+	// Should call OCI 1.1 path, not legacy
+	legacyCalled := false
+	cosignVerifyAttestations = func(ctx context.Context, ref name.Reference, co *cosign.CheckOpts, nameOpts ...name.Option) ([]oci.Signature, bool, error) {
+		legacyCalled = true
+		return nil, false, errors.New("should not call legacy")
+	}
+
+	_, err := validAttestations(ctx, ref, checkOpts)
+
+	// OCI 1.1 should succeed and legacy should not be called
+	if legacyCalled {
+		t.Error("Legacy cosignVerifyAttestations should not have been called when OCI 1.1 succeeds")
+	}
+	if err != nil {
+		t.Errorf("Expected OCI 1.1 to succeed, got error: %v", err)
+	}
+}
+
+func TestValidAttestationsOCI11Fallback(t *testing.T) {
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save originals
+	origResolve := ociremoteResolveDigest
+	origVerifyAtt := cosignVerifyAttestations
+	defer func() {
+		ociremoteResolveDigest = origResolve
+		cosignVerifyAttestations = origVerifyAtt
+	}()
+
+	// Test with EnableOCI11 = true but OCI 1.1 fails
+	cfg := &policycontrollerconfig.PolicyControllerConfig{
+		EnableOCI11: true,
+	}
+	ctx = policycontrollerconfig.ToContext(ctx, cfg)
+
+	// Mock OCI 1.1 to fail
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		return name.Digest{}, errors.New("OCI 1.1 not supported")
+	}
+
+	// Mock legacy to succeed
+	legacyCalled := false
+	mockSig, _ := static.NewSignature(nil, "")
+	cosignVerifyAttestations = func(ctx context.Context, ref name.Reference, co *cosign.CheckOpts, nameOpts ...name.Option) ([]oci.Signature, bool, error) {
+		legacyCalled = true
+		return []oci.Signature{mockSig}, true, nil
+	}
+
+	sigs, err := validAttestations(ctx, ref, checkOpts)
+
+	if !legacyCalled {
+		t.Error("Legacy cosignVerifyAttestations should have been called as fallback")
+	}
+	if err != nil {
+		t.Errorf("Expected fallback to succeed, got error: %v", err)
+	}
+	if len(sigs) != 1 {
+		t.Errorf("Expected 1 signature from fallback, got %d", len(sigs))
+	}
+}
+
+func TestValidAttestationsOCI11Disabled(t *testing.T) {
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save originals
+	origResolve := ociremoteResolveDigest
+	origVerifyAtt := cosignVerifyAttestations
+	defer func() {
+		ociremoteResolveDigest = origResolve
+		cosignVerifyAttestations = origVerifyAtt
+	}()
+
+	// Test with EnableOCI11 = false (default)
+	cfg := &policycontrollerconfig.PolicyControllerConfig{
+		EnableOCI11: false,
+	}
+	ctx = policycontrollerconfig.ToContext(ctx, cfg)
+
+	// Mock OCI 1.1 - should not be called
+	oci11Called := false
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		oci11Called = true
+		return name.Digest{}, errors.New("should not call")
+	}
+
+	// Mock legacy to succeed
+	mockSig, _ := static.NewSignature(nil, "")
+	cosignVerifyAttestations = func(ctx context.Context, ref name.Reference, co *cosign.CheckOpts, nameOpts ...name.Option) ([]oci.Signature, bool, error) {
+		return []oci.Signature{mockSig}, true, nil
+	}
+
+	sigs, err := validAttestations(ctx, ref, checkOpts)
+
+	if oci11Called {
+		t.Error("OCI 1.1 path should not have been called when disabled")
+	}
+	if err != nil {
+		t.Errorf("Expected legacy to succeed, got error: %v", err)
+	}
+	if len(sigs) != 1 {
+		t.Errorf("Expected 1 signature, got %d", len(sigs))
+	}
+}
+
+func TestDiscoverAttestationsOCI11NoAttestations(t *testing.T) {
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save originals
+	origResolve := ociremoteResolveDigest
+	origReferrers := ociremoteReferrers
+	defer func() {
+		ociremoteResolveDigest = origResolve
+		ociremoteReferrers = origReferrers
+	}()
+
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		return name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234").(name.Digest), nil
+	}
+
+	// Return index with no in-toto artifacts
+	mockManifest := &v1.IndexManifest{
+		Manifests: []v1.Descriptor{
+			{
+				ArtifactType: "application/vnd.oci.image.manifest.v1+json",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "somedigest",
+				},
+			},
+		},
+	}
+
+	ociremoteReferrers = func(d name.Digest, artifactType string, opts ...remote.Option) (*v1.IndexManifest, error) {
+		return mockManifest, nil
+	}
+
+	_, err := discoverAttestationsOCI11(ctx, ref, checkOpts)
+
+	if err == nil {
+		t.Error("Expected error when no attestations found")
+	}
+	if !strings.Contains(err.Error(), "no attestations found") {
+		t.Errorf("Expected 'no attestations found' error, got: %v", err)
+	}
+}
+
+func TestDiscoverAttestationsOCI11ResolveDigestFails(t *testing.T) {
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save original
+	origResolve := ociremoteResolveDigest
+	defer func() {
+		ociremoteResolveDigest = origResolve
+	}()
+
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		return name.Digest{}, errors.New("resolve failed")
+	}
+
+	_, err := discoverAttestationsOCI11(ctx, ref, checkOpts)
+
+	if err == nil {
+		t.Error("Expected error when resolve digest fails")
+	}
+	if !strings.Contains(err.Error(), "resolve failed") {
+		t.Errorf("Expected 'resolve failed' error, got: %v", err)
+	}
+}
+
+func TestDiscoverAttestationsOCI11ReferrersFails(t *testing.T) {
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save originals
+	origResolve := ociremoteResolveDigest
+	origReferrers := ociremoteReferrers
+	defer func() {
+		ociremoteResolveDigest = origResolve
+		ociremoteReferrers = origReferrers
+	}()
+
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		return name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234").(name.Digest), nil
+	}
+
+	ociremoteReferrers = func(d name.Digest, artifactType string, opts ...remote.Option) (*v1.IndexManifest, error) {
+		return nil, errors.New("referrers API not supported")
+	}
+
+	_, err := discoverAttestationsOCI11(ctx, ref, checkOpts)
+
+	if err == nil {
+		t.Error("Expected error when referrers call fails")
+	}
+	if !strings.Contains(err.Error(), "referrers API not supported") {
+		t.Errorf("Expected 'referrers API not supported' error, got: %v", err)
+	}
+}
+
+// Mock types for testing
+type mockSignedImage struct {
+	layers []v1.Layer
+}
+
+func (m *mockSignedImage) Digest() (v1.Hash, error) {
+	return v1.Hash{}, nil
+}
+
+func (m *mockSignedImage) Signatures() (oci.Signatures, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) Attestations() (oci.Signatures, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) Attachment(name string) (oci.File, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) Layers() ([]v1.Layer, error) {
+	return m.layers, nil
+}
+
+func (m *mockSignedImage) ConfigName() (v1.Hash, error) {
+	return v1.Hash{}, nil
+}
+
+func (m *mockSignedImage) ConfigFile() (*v1.ConfigFile, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) RawConfigFile() ([]byte, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) Manifest() (*v1.Manifest, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) RawManifest() ([]byte, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) LayerByDigest(hash v1.Hash) (v1.Layer, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) LayerByDiffID(hash v1.Hash) (v1.Layer, error) {
+	return nil, nil
+}
+
+func (m *mockSignedImage) MediaType() (v1types.MediaType, error) {
+	return v1types.OCIManifestSchema1, nil
+}
+
+func (m *mockSignedImage) Size() (int64, error) {
+	return 0, nil
+}
+
+type mockLayer struct {
+	content []byte
+}
+
+func (m *mockLayer) Digest() (v1.Hash, error) {
+	return v1.Hash{}, nil
+}
+
+func (m *mockLayer) DiffID() (v1.Hash, error) {
+	return v1.Hash{}, nil
+}
+
+func (m *mockLayer) Compressed() (io.ReadCloser, error) {
+	return io.NopCloser(bytes.NewReader(m.content)), nil
+}
+
+func (m *mockLayer) Uncompressed() (io.ReadCloser, error) {
+	return io.NopCloser(bytes.NewReader(m.content)), nil
+}
+
+func (m *mockLayer) Size() (int64, error) {
+	return int64(len(m.content)), nil
+}
+
+func (m *mockLayer) MediaType() (v1types.MediaType, error) {
+	return v1types.OCILayer, nil
+}
+
+func TestProcessAttestationArtifact(t *testing.T) {
+	// Save original
+	origSignedImage := ociremoteSignedImage
+	defer func() {
+		ociremoteSignedImage = origSignedImage
+	}()
+
+	repo, _ := name.NewRepository("example.com/test")
+	descriptor := v1.Descriptor{
+		Digest: v1.Hash{
+			Algorithm: "sha256",
+			Hex:       "abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234",
+		},
+	}
+
+	tests := []struct {
+		name         string
+		descriptor   v1.Descriptor
+		mockImage    func(name.Reference, ...remote.Option) (oci.SignedImage, error)
+		wantErr      bool
+		wantSigCount int
+	}{
+		{
+			name:       "valid DSSE envelope",
+			descriptor: descriptor,
+			mockImage: func(ref name.Reference, opts ...remote.Option) (oci.SignedImage, error) {
+				// Valid DSSE envelope with proper base64 payload
+				dsseContent := []byte(`{"payload":"eyJ0ZXN0IjoidmFsdWUifQ==","signatures":[{"sig":"c2lnbmF0dXJl"}]}`)
+				return &mockSignedImage{
+					layers: []v1.Layer{
+						&mockLayer{content: dsseContent},
+					},
+				}, nil
+			},
+			wantErr:      false,
+			wantSigCount: 1,
+		},
+		{
+			name:       "multiple signatures in envelope",
+			descriptor: descriptor,
+			mockImage: func(ref name.Reference, opts ...remote.Option) (oci.SignedImage, error) {
+				dsseContent := []byte(`{"payload":"eyJ0ZXN0IjoidmFsdWUifQ==","signatures":[{"sig":"c2lnMQ=="},{"sig":"c2lnMg=="}]}`)
+				return &mockSignedImage{
+					layers: []v1.Layer{
+						&mockLayer{content: dsseContent},
+					},
+				}, nil
+			},
+			wantErr:      false,
+			wantSigCount: 2,
+		},
+		{
+			name: "invalid digest format",
+			descriptor: v1.Descriptor{
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "invalid",
+				},
+			},
+			mockImage: func(ref name.Reference, opts ...remote.Option) (oci.SignedImage, error) {
+				return nil, nil
+			},
+			wantErr: true,
+		},
+		{
+			name:       "failed to get signed image",
+			descriptor: descriptor,
+			mockImage: func(ref name.Reference, opts ...remote.Option) (oci.SignedImage, error) {
+				return nil, errors.New("failed to fetch image")
+			},
+			wantErr: true,
+		},
+		{
+			name:       "no layers in image",
+			descriptor: descriptor,
+			mockImage: func(ref name.Reference, opts ...remote.Option) (oci.SignedImage, error) {
+				return &mockSignedImage{
+					layers: []v1.Layer{},
+				}, nil
+			},
+			wantErr: true,
+		},
+		{
+			name:       "invalid JSON in layer",
+			descriptor: descriptor,
+			mockImage: func(ref name.Reference, opts ...remote.Option) (oci.SignedImage, error) {
+				return &mockSignedImage{
+					layers: []v1.Layer{
+						&mockLayer{content: []byte("not json")},
+					},
+				}, nil
+			},
+			wantErr: true,
+		},
+		{
+			name:       "empty signatures array",
+			descriptor: descriptor,
+			mockImage: func(ref name.Reference, opts ...remote.Option) (oci.SignedImage, error) {
+				dsseContent := []byte(`{"payload":"eyJ0ZXN0IjoidmFsdWUifQ==","signatures":[]}`)
+				return &mockSignedImage{
+					layers: []v1.Layer{
+						&mockLayer{content: dsseContent},
+					},
+				}, nil
+			},
+			wantErr:      false,
+			wantSigCount: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ociremoteSignedImage = tt.mockImage
+
+			sigs, err := processAttestationArtifact(tt.descriptor, repo, nil)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("wantErr=%v, got err=%v", tt.wantErr, err)
+			}
+			if !tt.wantErr && len(sigs) != tt.wantSigCount {
+				t.Errorf("wanted %d signatures, got %d", tt.wantSigCount, len(sigs))
+			}
+		})
+	}
+}
+
+func TestDiscoverAttestationsOCI11SuccessfulDiscovery(t *testing.T) {
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save originals
+	origResolve := ociremoteResolveDigest
+	origReferrers := ociremoteReferrers
+	origProcessAtt := testProcessAttestationArtifact
+	defer func() {
+		ociremoteResolveDigest = origResolve
+		ociremoteReferrers = origReferrers
+		testProcessAttestationArtifact = origProcessAtt
+	}()
+
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		return name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234").(name.Digest), nil
+	}
+
+	// Return manifest with in-toto attestations
+	mockManifest := &v1.IndexManifest{
+		Manifests: []v1.Descriptor{
+			{
+				ArtifactType: "application/vnd.in-toto+json",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "att1111111111111111111111111111111111111111111111111111111111",
+				},
+			},
+			{
+				ArtifactType: "application/vnd.in-toto.provenance",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "att2222222222222222222222222222222222222222222222222222222222",
+				},
+			},
+		},
+	}
+
+	ociremoteReferrers = func(d name.Digest, artifactType string, opts ...remote.Option) (*v1.IndexManifest, error) {
+		return mockManifest, nil
+	}
+
+	// Mock processAttestationArtifact to return valid signatures
+	testProcessAttestationArtifact = func(result v1.Descriptor, repository name.Repository, registryOpts []remote.Option) ([]oci.Signature, error) {
+		mockSig, _ := static.NewSignature(nil, "")
+		return []oci.Signature{mockSig}, nil
+	}
+
+	sigs, err := discoverAttestationsOCI11(ctx, ref, checkOpts)
+
+	if err != nil {
+		t.Errorf("Expected success, got error: %v", err)
+	}
+	// Should have 2 signatures (one from each in-toto artifact)
+	if len(sigs) != 2 {
+		t.Errorf("Expected 2 signatures from 2 in-toto artifacts, got %d", len(sigs))
+	}
+}
+
+func TestDiscoverAttestationsOCI11MixedArtifacts(t *testing.T) {
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save originals
+	origResolve := ociremoteResolveDigest
+	origReferrers := ociremoteReferrers
+	origProcessAtt := testProcessAttestationArtifact
+	defer func() {
+		ociremoteResolveDigest = origResolve
+		ociremoteReferrers = origReferrers
+		testProcessAttestationArtifact = origProcessAtt
+	}()
+
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		return name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234").(name.Digest), nil
+	}
+
+	// Mix of in-toto and non-in-toto artifacts (should only process in-toto)
+	mockManifest := &v1.IndexManifest{
+		Manifests: []v1.Descriptor{
+			{
+				ArtifactType: "application/vnd.oci.image.manifest.v1+json",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "img1111111111111111111111111111111111111111111111111111111111",
+				},
+			},
+			{
+				ArtifactType: "application/vnd.in-toto+dsse",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "att1111111111111111111111111111111111111111111111111111111111",
+				},
+			},
+			{
+				ArtifactType: "application/vnd.oci.artifact.manifest.v1+json",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "art1111111111111111111111111111111111111111111111111111111111",
+				},
+			},
+		},
+	}
+
+	ociremoteReferrers = func(d name.Digest, artifactType string, opts ...remote.Option) (*v1.IndexManifest, error) {
+		return mockManifest, nil
+	}
+
+	processedCount := 0
+	testProcessAttestationArtifact = func(result v1.Descriptor, repository name.Repository, registryOpts []remote.Option) ([]oci.Signature, error) {
+		processedCount++
+		mockSig, _ := static.NewSignature(nil, "")
+		return []oci.Signature{mockSig}, nil
+	}
+
+	sigs, err := discoverAttestationsOCI11(ctx, ref, checkOpts)
+
+	if err != nil {
+		t.Errorf("Expected success, got error: %v", err)
+	}
+	// Should only process the one in-toto artifact
+	if processedCount != 1 {
+		t.Errorf("Expected processAttestationArtifact to be called once, called %d times", processedCount)
+	}
+	if len(sigs) != 1 {
+		t.Errorf("Expected 1 signature from 1 in-toto artifact, got %d", len(sigs))
+	}
+}
+
+func TestDiscoverAttestationsOCI11PartialProcessingFailure(t *testing.T) {
+	ctx := context.Background()
+	ref := name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234")
+	checkOpts := &cosign.CheckOpts{}
+
+	// Save originals
+	origResolve := ociremoteResolveDigest
+	origReferrers := ociremoteReferrers
+	origProcessAtt := testProcessAttestationArtifact
+	defer func() {
+		ociremoteResolveDigest = origResolve
+		ociremoteReferrers = origReferrers
+		testProcessAttestationArtifact = origProcessAtt
+	}()
+
+	ociremoteResolveDigest = func(ref name.Reference, opts ...remote.Option) (name.Digest, error) {
+		return name.MustParseReference("example.com/test@sha256:abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234").(name.Digest), nil
+	}
+
+	// Multiple in-toto artifacts
+	mockManifest := &v1.IndexManifest{
+		Manifests: []v1.Descriptor{
+			{
+				ArtifactType: "application/vnd.in-toto+json",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "good111111111111111111111111111111111111111111111111111111111",
+				},
+			},
+			{
+				ArtifactType: "application/vnd.in-toto+json",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "bad2222222222222222222222222222222222222222222222222222222222",
+				},
+			},
+			{
+				ArtifactType: "application/vnd.in-toto+json",
+				Digest: v1.Hash{
+					Algorithm: "sha256",
+					Hex:       "good333333333333333333333333333333333333333333333333333333333",
+				},
+			},
+		},
+	}
+
+	ociremoteReferrers = func(d name.Digest, artifactType string, opts ...remote.Option) (*v1.IndexManifest, error) {
+		return mockManifest, nil
+	}
+
+	callCount := 0
+	testProcessAttestationArtifact = func(result v1.Descriptor, repository name.Repository, registryOpts []remote.Option) ([]oci.Signature, error) {
+		callCount++
+		if callCount == 2 {
+			// Second call fails
+			return nil, errors.New("processing failed for second artifact")
+		}
+		// First and third succeed
+		mockSig, _ := static.NewSignature(nil, "")
+		return []oci.Signature{mockSig}, nil
+	}
+
+	sigs, err := discoverAttestationsOCI11(ctx, ref, checkOpts)
+
+	// Should succeed with 2 signatures (second one failed but was skipped with logging)
+	if err != nil {
+		t.Errorf("Expected success with partial failures, got error: %v", err)
+	}
+	if callCount != 3 {
+		t.Errorf("Expected processAttestationArtifact called 3 times, got %d", callCount)
+	}
+	if len(sigs) != 2 {
+		t.Errorf("Expected 2 signatures (second failed), got %d", len(sigs))
+	}
 }

@@ -34,10 +34,10 @@ import (
 	v1 "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 	"github.com/google/go-containerregistry/pkg/v1/types"
-	"github.com/sigstore/cosign/v2/pkg/cosign"
-	"github.com/sigstore/cosign/v2/pkg/oci"
-	ociremote "github.com/sigstore/cosign/v2/pkg/oci/remote"
-	"github.com/sigstore/cosign/v2/pkg/policy"
+	"github.com/sigstore/cosign/v3/pkg/cosign"
+	"github.com/sigstore/cosign/v3/pkg/oci"
+	ociremote "github.com/sigstore/cosign/v3/pkg/oci/remote"
+	"github.com/sigstore/cosign/v3/pkg/policy"
 	"github.com/sigstore/policy-controller/pkg/apis/config"
 	policyduckv1beta1 "github.com/sigstore/policy-controller/pkg/apis/duck/v1beta1"
 	policycontrollerconfig "github.com/sigstore/policy-controller/pkg/config"
@@ -372,8 +372,10 @@ func setNoMatchingPoliciesError(ctx context.Context, image, field string, index 
 		// Allow it through, nothing to do.
 		return nil
 	case policycontrollerconfig.DenyAll:
+		logging.FromContext(ctx).Errorf("no matching policies for image %s", image)
 		return noMatchingPolicyError
 	case policycontrollerconfig.WarnAll:
+		logging.FromContext(ctx).Warnf("no matching policies for image %s", image)
 		return noMatchingPolicyError.At(apis.WarningLevel)
 	default:
 		// Fail closed.
@@ -519,7 +521,7 @@ func ValidatePolicy(ctx context.Context, namespace string, ref name.Reference, c
 			switch {
 			case authority.Static != nil:
 				if authority.Static.Action == "fail" {
-					result.err = cosign.NewVerificationError("disallowed by static policy: %s", authority.Static.Message)
+					result.err = fmt.Errorf("disallowed by static policy: %s", authority.Static.Message)
 					results <- result
 					return
 				}
@@ -876,7 +878,7 @@ func ValidatePolicyAttestationsForAuthority(ctx context.Context, ref name.Refere
 	// path, then error out
 	if len(verifiedAttestations) == 0 {
 		logging.FromContext(ctx).Errorf("no valid attestations found for authority %s for %s", name, ref.Name())
-		return nil, fmt.Errorf("%s for authority %s for %s", cosign.ErrNoMatchingAttestationsMessage, name, ref.Name())
+		return nil, fmt.Errorf("%s for authority %s for %s", "no matching attestations", name, ref.Name())
 	}
 	logging.FromContext(ctx).Debugf("Found %d valid attestations, validating policies for them", len(verifiedAttestations))
 
@@ -960,7 +962,7 @@ func ValidatePolicyAttestationsForAuthority(ctx context.Context, ref name.Refere
 			for pt := range checkedPredicateTypes {
 				cpt = append(cpt, pt)
 			}
-			return nil, fmt.Errorf("%s with type %s, checked the following predicateTypes: %q", cosign.ErrNoMatchingAttestationsMessage, wantedAttestation.PredicateType, strings.Join(cpt, ","))
+			return nil, fmt.Errorf("%s with type %s, checked the following predicateTypes: %q", "no matching attestations", wantedAttestation.PredicateType, strings.Join(cpt, ","))
 		}
 		ret[wantedAttestation.Name] = attestationToPolicyAttestations(ctx, checkedAttestations)
 	}
@@ -1348,9 +1350,13 @@ func normalizeArchitecture(cf *v1.ConfigFile) string {
 // checkOptsFromAuthority creates the necessary options for calling Cosign
 // verify functions (signatures and attestations).
 func checkOptsFromAuthority(ctx context.Context, authority webhookcip.Authority, remoteOpts ...ociremote.Option) (*cosign.CheckOpts, error) {
+	// Get the policy controller configuration to check if OCI 1.1 is enabled
+	cfg := policycontrollerconfig.FromContextOrDefaults(ctx)
+
 	ret := &cosign.CheckOpts{
 		RegistryClientOpts: remoteOpts,
 		NewBundleFormat:    authority.SignatureFormat == "bundle",
+		ExperimentalOCI11:  cfg.EnableOCI11,
 	}
 
 	// Add in the identities for verification purposes

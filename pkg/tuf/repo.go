@@ -33,8 +33,12 @@ import (
 	"time"
 
 	"github.com/sigstore/sigstore-go/pkg/root"
+	sigstoretuf "github.com/sigstore/sigstore-go/pkg/tuf"
 	"github.com/sigstore/sigstore/pkg/tuf"
-	"github.com/theupdateframework/go-tuf/client"
+	"github.com/theupdateframework/go-tuf/v2/metadata"
+	tufconfig "github.com/theupdateframework/go-tuf/v2/metadata/config"
+	"github.com/theupdateframework/go-tuf/v2/metadata/fetcher"
+	"github.com/theupdateframework/go-tuf/v2/metadata/updater"
 	"sigs.k8s.io/release-utils/version"
 )
 
@@ -232,70 +236,142 @@ func UncompressMemFS(src io.Reader, stripPrefix string) (fs.FS, error) {
 	return testFS, nil
 }
 
+// fsFetcher implements the go-tuf v2 fetcher.Fetcher interface using an fs.FS.
+type fsFetcher struct {
+	fsys    fs.FS
+	baseURL string
+}
+
+func (f *fsFetcher) DownloadFile(urlPath string, maxLength int64, timeout time.Duration) ([]byte, error) {
+	path := strings.TrimPrefix(urlPath, f.baseURL)
+	path = strings.TrimPrefix(path, "/")
+	data, err := fs.ReadFile(f.fsys, path)
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			// Return ErrDownloadHTTP with 404 so the TUF updater recognizes missing
+			// files (e.g. during root rotation when 2.root.json doesn't exist).
+			return nil, &metadata.ErrDownloadHTTP{StatusCode: http.StatusNotFound, URL: urlPath}
+		}
+		return nil, &metadata.ErrDownload{Msg: fmt.Sprintf("reading %s: %v", path, err)}
+	}
+	if maxLength > 0 && int64(len(data)) > maxLength {
+		return nil, &metadata.ErrDownloadLengthMismatch{Msg: fmt.Sprintf("file %s is %d bytes, max %d", path, len(data), maxLength)}
+	}
+	return data, nil
+}
+
+// TUFClient wraps a sigstore-go TUF client for delegation-aware target
+// retrieval and provides lazy access to a raw go-tuf v2 updater for
+// legacy target enumeration via GetTopLevelTargets.
+type TUFClient struct {
+	client *sigstoretuf.Client
+
+	// Fields for lazy-initialized raw updater (legacy enumeration only).
+	once        sync.Once
+	updater     *updater.Updater
+	updaterErr  error
+	metadataURL string
+	rootJSON    []byte
+	targetsURL  string
+	fetcher     fetcher.Fetcher
+}
+
+// GetTarget downloads a target by name, correctly traversing TUF delegations.
+func (c *TUFClient) GetTarget(target string) ([]byte, error) {
+	return c.client.GetTarget(target)
+}
+
+// GetTopLevelTargets returns the top-level target files metadata. This does
+// not traverse delegations and should only be used for legacy fallback paths.
+// The raw updater is lazily initialized on first call to avoid a double TUF
+// refresh when only GetTarget is needed.
+func (c *TUFClient) GetTopLevelTargets() (map[string]*metadata.TargetFiles, error) {
+	c.once.Do(func() {
+		c.updater, c.updaterErr = newRawUpdater(c.metadataURL, c.rootJSON, c.targetsURL, c.fetcher)
+	})
+	if c.updaterErr != nil {
+		return nil, c.updaterErr
+	}
+	return c.updater.GetTopLevelTargets(), nil
+}
+
 // ClientFromSerializedMirror will construct a TUF client by
 // unzip/untar the repository and constructing an in-memory TUF
-// client for it. Will also Init/Update it.
-func ClientFromSerializedMirror(_ context.Context, repo, rootJSON []byte, targets, stripPrefix string) (*client.Client, error) {
-	// unzip/untar the repository.
+// client for it.
+func ClientFromSerializedMirror(_ context.Context, repo, rootJSON []byte, targets, stripPrefix string) (*TUFClient, error) {
 	tufFS, err := UncompressMemFS(bytes.NewReader(repo), stripPrefix)
 	if err != nil {
 		return nil, fmt.Errorf("failed to uncompress: %w", err)
 	}
-	remote, err := client.NewFileRemoteStore(tufFS, targets)
+
+	const baseURL = "mem://repo/"
+	f := &fsFetcher{fsys: tufFS, baseURL: baseURL}
+
+	opts := sigstoretuf.DefaultOptions().
+		WithRoot(rootJSON).
+		WithRepositoryBaseURL(baseURL).
+		WithDisableLocalCache().
+		WithFetcher(f)
+
+	client, err := sigstoretuf.New(opts)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create remote store: %w", err)
+		return nil, fmt.Errorf("failed to create TUF client: %w", err)
 	}
 
-	local := client.MemoryLocalStore()
-	tufClient := client.NewClient(local, remote)
-
-	// TODO(vaikas): What should we do with above tufClient validation
-	// wise before just returning it?
-	err = tufClient.Init(rootJSON)
-	if err != nil {
-		return nil, fmt.Errorf("failed to init TUF client: %w", err)
-	}
-	targetFiles, err := tufClient.Update()
-	if err != nil {
-		return nil, fmt.Errorf("failed to update TUF client: %w", err)
-	}
-
-	if len(targetFiles) == 0 {
-		return nil, errors.New("there are no valid targetfiles in TUF repo")
-	}
-	return tufClient, nil
+	return &TUFClient{
+		client:      client,
+		metadataURL: baseURL,
+		rootJSON:    rootJSON,
+		targetsURL:  baseURL + targets + "/",
+		fetcher:     f,
+	}, nil
 }
 
-// ClientFromRemote will construct a TUF client from a root, and mirror
-func ClientFromRemote(_ context.Context, mirror string, rootJSON []byte, targets string) (*client.Client, error) {
-	opts := &client.HTTPRemoteOptions{
-		UserAgent:   uaString,
-		TargetsPath: targets,
-		Retries:     client.DefaultHTTPRetries,
-	}
-	// It's a bit unfortunate that the TUF client methods don't support context
-	// We could maybe plumb timeouts through from our context and set the
-	// timeouts based on that.
-	remote, err := client.HTTPRemoteStore(mirror, opts, &http.Client{
-		Timeout: 4 * time.Second})
+// ClientFromRemote will construct a TUF client from a root and mirror.
+func ClientFromRemote(_ context.Context, mirror string, rootJSON []byte, targets string) (*TUFClient, error) {
+	f := fetcher.NewDefaultFetcher()
+	f.SetHTTPUserAgent(uaString)
+	f.SetHTTPClient(&http.Client{Timeout: 30 * time.Second})
+
+	opts := sigstoretuf.DefaultOptions().
+		WithRoot(rootJSON).
+		WithRepositoryBaseURL(mirror).
+		WithDisableLocalCache().
+		WithFetcher(f)
+
+	client, err := sigstoretuf.New(opts)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create remote HTTP store: %w", err)
-	}
-	local := client.MemoryLocalStore()
-	tufClient := client.NewClient(local, remote)
-	err = tufClient.Init(rootJSON)
-	if err != nil {
-		return nil, fmt.Errorf("failed to init TUF client: %w", err)
-	}
-	targetFiles, err := tufClient.Update()
-	if err != nil {
-		return nil, fmt.Errorf("failed to update TUF client: %w", err)
+		return nil, fmt.Errorf("failed to create TUF client: %w", err)
 	}
 
-	if len(targetFiles) == 0 {
-		return nil, errors.New("there are no valid targetfiles in TUF repo")
+	return &TUFClient{
+		client:      client,
+		metadataURL: mirror,
+		rootJSON:    rootJSON,
+		targetsURL:  mirror + "/" + targets + "/",
+		fetcher:     f,
+	}, nil
+}
+
+// newRawUpdater creates a go-tuf v2 updater for legacy target enumeration.
+func newRawUpdater(metadataURL string, rootJSON []byte, targetsURL string, f fetcher.Fetcher) (*updater.Updater, error) {
+	cfg, err := tufconfig.New(metadataURL, rootJSON)
+	if err != nil {
+		return nil, err
 	}
-	return tufClient, nil
+	cfg.Fetcher = f
+	cfg.RemoteTargetsURL = targetsURL
+	cfg.DisableLocalCache = true
+	cfg.PrefixTargetsWithHash = true
+
+	u, err := updater.New(cfg)
+	if err != nil {
+		return nil, err
+	}
+	if err := u.Refresh(); err != nil {
+		return nil, err
+	}
+	return u, nil
 }
 
 var (
