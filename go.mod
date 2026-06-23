@@ -3,7 +3,7 @@ module github.com/sigstore/policy-controller
 go 1.26.0
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.41.9 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.41.9
 	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/go-cmp v0.7.0
 	github.com/google/go-containerregistry v0.21.5
@@ -63,6 +63,10 @@ require (
 	github.com/sigstore/protobuf-specs v0.5.1
 	github.com/sigstore/scaffolding v0.7.22
 	github.com/sigstore/sigstore-go v1.1.4
+	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.8
+	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.8
+	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.10.8
+	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.10.8
 	github.com/spf13/viper v1.21.0
 	github.com/theupdateframework/go-tuf v0.7.0
 	knative.dev/hack/schema v0.0.0-20260428014158-b2a37f1b6e7b
@@ -70,14 +74,19 @@ require (
 )
 
 require (
+	cloud.google.com/go v0.123.0 // indirect
+	cloud.google.com/go/auth v0.20.0 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.2.8 // indirect
+	cloud.google.com/go/kms v1.31.0 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/internal v1.2.0 // indirect
 	github.com/creack/pty v1.1.24 // indirect
 	github.com/emicklei/proto v1.14.3 // indirect
+	github.com/google/s2a-go v0.1.9 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.16 // indirect
+	github.com/googleapis/gax-go/v2 v2.22.0 // indirect
+	github.com/jellydator/ttlcache/v3 v3.4.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20260420112717-c39628bde8b5 // indirect
-	github.com/sigstore/sigstore/pkg/signature/kms/aws v1.10.8 // indirect
-	github.com/sigstore/sigstore/pkg/signature/kms/azure v1.10.8 // indirect
-	github.com/sigstore/sigstore/pkg/signature/kms/gcp v1.10.8 // indirect
-	github.com/sigstore/sigstore/pkg/signature/kms/hashivault v1.10.8 // indirect
 )
 
 require (
