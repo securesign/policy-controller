@@ -1,0 +1,34 @@
+## Build stage
+FROM registry.redhat.io/ubi9/go-toolset:latest@sha256:1503a8227c00a1934e3c1a4a88e0be785786a2d9e2f62a9334e75ff2fadca2fe AS build-env
+WORKDIR /opt/app-root/src/
+USER root
+ENV GOEXPERIMENT=strictfipsruntime
+
+# Set up build environment
+RUN git config --global --add safe.directory /opt/app-root/src
+COPY . .
+
+RUN CGO_ENABLED=1 go build -mod=mod \
+    -ldflags "-buildid= \
+               -X sigs.k8s.io/release-utils/version.gitVersion=$(git describe --tags --always) \
+               -X sigs.k8s.io/release-utils/version.gitCommit=$(git rev-parse HEAD) \
+               -X sigs.k8s.io/release-utils/version.gitTreeState=$(git status --porcelain | awk '{print $1}' | head -n 1 || echo "clean") \
+               -X sigs.k8s.io/release-utils/version.buildDate=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    -o ./policy-controller ./cmd/webhook
+
+# Install stage
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:1bc3c5c15720506a0cf48adfdf8b623dfe704377e007d7bbae8d14876392ca6a
+COPY --from=build-env /opt/app-root/src/policy-controller /usr/local/bin/policy-controller
+WORKDIR /opt/app-root/src/home
+COPY LICENSE /licenses/LICENSE
+USER 65532:65532
+
+LABEL description="The policy-controller admission controller can be used to enforce policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
+LABEL io.k8s.description="The policy-controller admission controller can be used to enforce policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
+LABEL io.k8s.display-name="policy-controller container image for Red Hat Trusted Signer"
+LABEL io.openshift.tags="policy-controller trusted-signer trusted-artifact-signer"
+LABEL summary="Provides the policy-controller admission controller for enforcing policy on a Kubernetes cluster based on verifiable supply-chain metadata from cosign."
+LABEL com.redhat.component="policy-controller"
+LABEL name="rhtas/policy-controller-rhel9"
+
+ENTRYPOINT [ "policy-controller" ]

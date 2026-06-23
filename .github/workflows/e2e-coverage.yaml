@@ -1,0 +1,285 @@
+# Copyright 2025 The Sigstore Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: E2E Coverage
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+permissions: {}
+
+jobs:
+  e2e-coverage:
+    name: E2E tests with coverage
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      REGISTRY_NAME: registry.local
+      REGISTRY_PORT: 5000
+      INSECURE_REGISTRY_NAME: insecure-registry.notlocal
+      INSECURE_REGISTRY_PORT: 5001
+      KO_DOCKER_REPO: registry.local:5000/policy-controller
+      SCAFFOLDING_RELEASE_VERSION: "v0.7.27"
+
+    steps:
+    - name: Free up disk space
+      run: |
+          rm -rf /usr/share/dotnet/
+          rm -rf "$AGENT_TOOLSDIRECTORY"
+          rm -rf "/usr/local/share/boost"
+          rm -rf /opt/ghc
+          docker rmi $(docker image ls -aq) || true
+          swapoff /swapfile || true
+          rm -rf /swapfile /usr/share/dotnet /usr/local/lib/android /opt/ghc  || true
+          apt purge aria2 ansible hhvm mono-devel azure-cli shellcheck rpm xorriso zsync \
+            clang-6.0 lldb-6.0 lld-6.0 clang-format-6.0 clang-8 lldb-8 lld-8 clang-format-8 \
+            clang-9 lldb-9 lld-9 clangd-9 clang-format-9 dotnet-sdk-3.0 dotnet-sdk-3.1=3.1.101-1 \
+            esl-erlang firefox g++-8 g++-9 gfortran-8 gfortran-9 google-chrome-stable \
+            google-cloud-sdk ghc-8.0.2 ghc-8.2.2 ghc-8.4.4 ghc-8.6.2 ghc-8.6.3 ghc-8.6.4 \
+            ghc-8.6.5 ghc-8.8.1 ghc-8.8.2 ghc-8.8.3 ghc-8.10.1 cabal-install-2.0 cabal-install-2.2 \
+            cabal-install-2.4 cabal-install-3.0 cabal-install-3.2 heroku imagemagick \
+            libmagickcore-dev libmagickwand-dev libmagic-dev ant ant-optional kubectl \
+            mercurial apt-transport-https mono-complete mysql-client libmysqlclient-dev \
+            mysql-server mssql-tools unixodbc-dev yarn bazel chrpath libssl-dev libxft-dev \
+            libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev php7.1 php7.1-bcmath \
+            php7.1-bz2 php7.1-cgi php7.1-cli php7.1-common php7.1-curl php7.1-dba php7.1-dev \
+            php7.1-enchant php7.1-fpm php7.1-gd php7.1-gmp php7.1-imap php7.1-interbase php7.1-intl \
+            php7.1-json php7.1-ldap php7.1-mbstring php7.1-mcrypt php7.1-mysql php7.1-odbc \
+            php7.1-opcache php7.1-pgsql php7.1-phpdbg php7.1-pspell php7.1-readline php7.1-recode \
+            php7.1-snmp php7.1-soap php7.1-sqlite3 php7.1-sybase php7.1-tidy php7.1-xml \
+            php7.1-xmlrpc php7.1-xsl php7.1-zip php7.2 php7.2-bcmath php7.2-bz2 php7.2-cgi \
+            php7.2-cli php7.2-common php7.2-curl php7.2-dba php7.2-dev php7.2-enchant php7.2-fpm \
+            php7.2-gd php7.2-gmp php7.2-imap php7.2-interbase php7.2-intl php7.2-json php7.2-ldap \
+            php7.2-mbstring php7.2-mysql php7.2-odbc php7.2-opcache php7.2-pgsql php7.2-phpdbg \
+            php7.2-pspell php7.2-readline php7.2-recode php7.2-snmp php7.2-soap php7.2-sqlite3 \
+            php7.2-sybase php7.2-tidy php7.2-xml php7.2-xmlrpc php7.2-xsl php7.2-zip php7.3 \
+            php7.3-bcmath php7.3-bz2 php7.3-cgi php7.3-cli php7.3-common php7.3-curl php7.3-dba \
+            php7.3-dev php7.3-enchant php7.3-fpm php7.3-gd php7.3-gmp php7.3-imap php7.3-interbase \
+            php7.3-intl php7.3-json php7.3-ldap php7.3-mbstring php7.3-mysql php7.3-odbc \
+            php7.3-opcache php7.3-pgsql php7.3-phpdbg php7.3-pspell php7.3-readline php7.3-recode \
+            php7.3-snmp php7.3-soap php7.3-sqlite3 php7.3-sybase php7.3-tidy php7.3-xml \
+            php7.3-xmlrpc php7.3-xsl php7.3-zip php7.4 php7.4-bcmath php7.4-bz2 php7.4-cgi \
+            php7.4-cli php7.4-common php7.4-curl php7.4-dba php7.4-dev php7.4-enchant php7.4-fpm \
+            php7.4-gd php7.4-gmp php7.4-imap php7.4-interbase php7.4-intl php7.4-json php7.4-ldap \
+            php7.4-mbstring php7.4-mysql php7.4-odbc php7.4-opcache php7.4-pgsql php7.4-phpdbg \
+            php7.4-pspell php7.4-readline php7.4-snmp php7.4-soap php7.4-sqlite3 php7.4-sybase \
+            php7.4-tidy php7.4-xml php7.4-xmlrpc php7.4-xsl php7.4-zip php-amqp php-apcu \
+            php-igbinary php-memcache php-memcached php-mongodb php-redis php-xdebug \
+            php-zmq snmp pollinate libpq-dev postgresql-client powershell ruby-full \
+            sphinxsearch subversion mongodb-org -yq >/dev/null 2>&1 || true
+          apt-get remove -y 'php.*' || true
+          apt-get autoremove -y >/dev/null 2>&1 || true
+          apt-get autoclean -y >/dev/null 2>&1 || true
+
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      with:
+        persist-credentials: false
+
+    - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      with:
+        go-version-file: './go.mod'
+        check-latest: true
+
+    - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d # v0.9
+
+    - uses: imranismail/setup-kustomize@2ba527d4d055ab63514ba50a99456fc35684947f # v2.1.0
+
+    - name: Install yq
+      uses: mikefarah/yq@45be35c06387d692bb6bf689919919e0e32e796f # v4.49.1
+
+    - name: Setup mirror
+      uses: chainguard-dev/actions/setup-mirror@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d # v1.5.10
+      with:
+        mirror: mirror.gcr.io
+
+    - uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
+
+    - name: Install coverport CLI
+      run: |
+        go install github.com/konflux-ci/coverport/cli@latest
+        mv "$(go env GOPATH)/bin/cli" "$(go env GOPATH)/bin/coverport"
+
+    - name: Install cluster + sigstore
+      uses: sigstore/scaffolding/actions/setup@main
+      with:
+        k8s-version: v1.31.x
+        version: ${{ env.SCAFFOLDING_RELEASE_VERSION }}
+
+    - name: Copy TUF root to policy-controller namespace
+      run: |
+        kubectl create ns cosign-system
+        kubectl -n tuf-system get secrets tuf-root -oyaml | sed 's/namespace: .*/namespace: cosign-system/' | kubectl create -f -
+        echo "TUF_ROOT_FILE=./root.json" >> $GITHUB_ENV
+
+    - name: Setup local insecure registry
+      run: |
+        # Create a self-signed SSL cert
+        mkdir -p insecure-certs
+        openssl req \
+          -subj "/C=US/ST=WA/L=Flavorton/O=Tests-R-Us/OU=Dept. of Insecurity/CN=example.com/emailAddress=testing@example.com" \
+          -newkey rsa:4096 -nodes -sha256 -keyout insecure-certs/domain.key \
+          -x509 -days 365 -out insecure-certs/domain.crt
+
+        # Run a registry.
+        docker run -d  --restart=always \
+          --name $INSECURE_REGISTRY_NAME \
+          -v "$(pwd)"/insecure-certs:/insecure-certs \
+          -e REGISTRY_HTTP_ADDR=0.0.0.0:$INSECURE_REGISTRY_PORT \
+          -e REGISTRY_HTTP_TLS_CERTIFICATE=/insecure-certs/domain.crt \
+          -e REGISTRY_HTTP_TLS_KEY=/insecure-certs/domain.key \
+          -p $INSECURE_REGISTRY_PORT:$INSECURE_REGISTRY_PORT \
+          registry:2
+
+        # Connect the registry to the KinD network.
+        docker network connect "kind" $INSECURE_REGISTRY_NAME
+
+        # Make the $INSECURE_REGISTRY_NAME -> 127.0.0.1, to tell `ko` to publish to
+        # local registry, even when pushing $INSECURE_REGISTRY_NAME:$INSECURE_REGISTRY_NAME/some/image
+        sudo echo "127.0.0.1 $INSECURE_REGISTRY_NAME" | sudo tee -a /etc/hosts
+
+    - name: Build coverage-instrumented image
+      run: make docker-build-coverage
+
+    - name: Load coverage image into KinD
+      run: kind load docker-image policy-controller:latest-coverage
+
+    - name: Deploy policy-controller with coverage image
+      run: |
+        # Generate base resources (RBAC, services, CRDs, webhook configs)
+        kustomize build config/ > test/kustomize/policy-controller-e2e.yaml
+
+        # Append the Deployment, replacing the ko:// placeholder with our coverage image
+        sed 's|ko://github.com/sigstore/policy-controller/cmd/webhook|policy-controller:latest-coverage|' \
+          config/webhook.yaml >> test/kustomize/policy-controller-e2e.yaml
+
+        # Apply via test/kustomize overlay which adds TUF mirror args to the webhook
+        kustomize build test/kustomize | kubectl apply -f -
+
+        # Wait for the webhook to come up and become Ready
+        kubectl rollout status --timeout 5m --namespace cosign-system deployments/webhook
+        kubectl wait deployment -n cosign-system --for condition=Available=True --timeout=90s --all
+        sleep 10
+
+    - name: Run E2E tests - Policy CRD
+      continue-on-error: true
+      run: ./test/e2e_test_policy_crd.sh
+
+    - name: Run E2E tests - Policy Controller
+      continue-on-error: true
+      run: ./test/e2e_test_policy_controller.sh
+
+    - name: Run E2E tests - Cluster Image Policy
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy.sh
+
+    - name: Run E2E tests - Cluster Image Policy from ConfigMap with Fetch Config
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_from_configmap_with_fetch_config_file.sh
+
+    - name: Run E2E tests - Cluster Image Policy from URL
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_from_url.sh
+
+    - name: Run E2E tests - Cluster Image Policy No TUF
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_no_tuf.sh
+
+    - name: Run E2E tests - Cluster Image Policy with Attestations
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_attestations.sh
+
+    - name: Run E2E tests - Cluster Image Policy with Attestations Rego
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_attestations_rego.sh
+
+    - name: Run E2E tests - Cluster Image Policy with Fetch Config
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_fetch_config_file.sh
+
+    - name: Run E2E tests - Cluster Image Policy with Include ObjectMeta
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_include_objectmeta.sh
+
+    - name: Run E2E tests - Cluster Image Policy with Include Spec
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_include_spec.sh
+
+    - name: Run E2E tests - Cluster Image Policy with Include TypeMeta
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_include_typemeta.sh
+
+    - name: Run E2E tests - Cluster Image Policy with Source
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_source.sh
+
+    - name: Run E2E tests - Cluster Image Policy with TrustRoot Bring Own Keys
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_trustroot_bring_own_keys.sh
+
+    - name: Run E2E tests - Cluster Image Policy with TrustRoot Remote
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_trustroot_remote.sh
+
+    - name: Run E2E tests - Cluster Image Policy with TrustRoot Repository
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_trustroot_repository.sh
+
+    - name: Run E2E tests - Cluster Image Policy with TSA
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_tsa.sh
+
+    - name: Run E2E tests - Cluster Image Policy with Warn
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_image_policy_with_warn.sh
+
+    - name: Run E2E tests - Cluster with Scalable
+      continue-on-error: true
+      run: ./test/e2e_test_cluster_with_scalable.sh
+
+    - name: Run E2E tests - TrustRoot CRD
+      continue-on-error: true
+      run: ./test/e2e_test_trustroot_crd.sh
+
+    - name: Collect coverage from webhook pod via Coverport
+      if: always()
+      run: |
+        coverport collect \
+          --namespace=cosign-system \
+          --label-selector=role=webhook \
+          --port=53700 \
+          --test-name=e2e \
+          --output=./e2e-coverage-data \
+          --source-dir=. \
+          --auto-process
+        find ./e2e-coverage-data -name '*.out' -type f || true
+
+    - name: Upload E2E coverage to Codecov
+      if: always()
+      uses: codecov/codecov-action@v6
+      with:
+        directory: ./e2e-coverage-data
+        flags: e2e
+        use_oidc: true
+        fail_ci_if_error: false
+
+    - name: Collect diagnostics
+      if: ${{ failure() }}
+      uses: chainguard-dev/actions/kind-diag@3e8a2a226fad9e1ecbf2d359b8a7697554a4ac6d # v1.5.10

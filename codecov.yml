@@ -1,5 +1,4 @@
-#
-# Copyright 2022 The Sigstore Authors.
+# Copyright 2025 The Sigstore Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,14 +11,19 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-name: 'Dependency Review'
-on: [pull_request]
 
-permissions:
-  contents: read
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        informational: true
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+        informational: true
 
-jobs:
-  dependency-review:
-    name: dependency-review
-    if: github.repository == 'sigstore/policy-controller'
-    uses: sigstore/community/.github/workflows/reusable-dependency-review.yml@a38887851a12d604b8441ed09e6ebf6b9fe17cbc # main branch 30/Jun/2025
+flag_management:
+  default_rules:
+    carryforward: true

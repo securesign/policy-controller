@@ -1,0 +1,23 @@
+# Build the coverage-instrumented policy-controller binary
+FROM golang:1.26 AS builder
+ARG TARGETOS
+ARG TARGETARCH
+
+WORKDIR /workspace
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+
+# -cover enables coverage instrumentation in the binary.
+# -covermode=atomic is required by runtime/coverage.WriteCounters().
+# -tags=coverage includes cmd/webhook/coverage.go which embeds the Coverport HTTP server.
+RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} \
+    go build -cover -covermode=atomic -tags=coverage \
+    -a -o policy-controller ./cmd/webhook
+
+FROM registry.access.redhat.com/ubi9/ubi-minimal@sha256:1bc3c5c15720506a0cf48adfdf8b623dfe704377e007d7bbae8d14876392ca6a
+WORKDIR /
+COPY --from=builder /workspace/policy-controller .
+USER 65532:65532
+
+ENTRYPOINT ["/policy-controller"]

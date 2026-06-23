@@ -24,6 +24,8 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    # RHTAS: skip because its upstream specific
+    if: github.repository == 'sigstore/policy-controller'
 
     permissions:
       id-token: write
