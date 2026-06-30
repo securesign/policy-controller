@@ -30,6 +30,8 @@ jobs:
       - uses: anchore/sbom-action/download-syft@fbfd9c6c189226748411491745178e0c2017392d # v0.20.10
 
       - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d # v0.9
+        with:
+          version: v0.18.1
 
       - name: Set LDFLAGS
         id: ldflags

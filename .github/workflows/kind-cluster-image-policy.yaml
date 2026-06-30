@@ -116,6 +116,8 @@ jobs:
 
     # will use the latest release available for ko
     - uses: ko-build/setup-ko@d006021bd0c28d1ce33a07e7943d48b079944c8d # v0.9
+      with:
+        version: v0.18.1
 
     - uses: imranismail/setup-kustomize@2ba527d4d055ab63514ba50a99456fc35684947f # v2.1.0
 
