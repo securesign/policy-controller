@@ -2,13 +2,15 @@
 FROM registry.redhat.io/ubi9/go-toolset:latest@sha256:6be524204bbafe05503f1404497b1a0046e94cd02db1032fefd154f905e11041 AS build-env
 WORKDIR /opt/app-root/src/
 USER root
-ENV GOEXPERIMENT=strictfipsruntime
+ENV CGO_ENABLED=0
+ENV GOFIPS140=v1.0.0
 
 # Set up build environment
 RUN git config --global --add safe.directory /opt/app-root/src
 COPY . .
 
-RUN CGO_ENABLED=1 go build -mod=mod \
+RUN go mod edit -godebug=fips140=auto && \
+    go build -mod=mod \
     -ldflags "-buildid= \
                -X sigs.k8s.io/release-utils/version.gitVersion=$(git describe --tags --always) \
                -X sigs.k8s.io/release-utils/version.gitCommit=$(git rev-parse HEAD) \
