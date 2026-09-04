@@ -115,7 +115,7 @@ jobs:
       with:
         mirror: mirror.gcr.io
 
-    - uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v2
+    - uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # v3.9.2
 
     - name: Install cluster + sigstore
       uses: sigstore/scaffolding/actions/setup@main
@@ -143,7 +143,7 @@ jobs:
         echo "TUF_ROOT_FILE=./root.json" >> $GITHUB_ENV
 
     - name: Checkout TSA for testing.
-      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v3.0.2
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         repository: sigstore/timestamp-authority
         path: ./src/github.com/sigstore/timestamp-authority
