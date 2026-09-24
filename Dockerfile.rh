@@ -1,5 +1,5 @@
 ## Build stage
-FROM registry.redhat.io/ubi9/go-toolset:latest@sha256:4a51a7611b9437b301a2fdf722c2b095e622fcf89fcf3fd7bec0561c5b917f18 AS build-env
+FROM registry.redhat.io/ubi9/go-toolset:latest@sha256:0f2be9ed624fabfe8625ffa510d2b243766249006518e551ef9e0b486f195e90 AS build-env
 WORKDIR /opt/app-root/src/
 USER root
 ENV CGO_ENABLED=0
