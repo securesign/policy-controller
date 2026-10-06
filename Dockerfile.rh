@@ -1,5 +1,5 @@
 ## Build stage
-FROM registry.redhat.io/ubi9/go-toolset:latest@sha256:0f2be9ed624fabfe8625ffa510d2b243766249006518e551ef9e0b486f195e90 AS build-env
+FROM registry.redhat.io/ubi9/go-toolset:latest@sha256:387721e62073a188b0ebdc43dedb9f7bf06ae6828156e9bc2922d9af456e69c8 AS build-env
 WORKDIR /opt/app-root/src/
 USER root
 ENV GOEXPERIMENT=strictfipsruntime
