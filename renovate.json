@@ -39,6 +39,13 @@
         "enabled": false
       },
       {
+        "description": "Pin letsencrypt/boulder - newer versions require go >= 1.27",
+        "matchPackageNames": [
+          "github.com/letsencrypt/boulder"
+        ],
+        "enabled": false
+      },
+      {
         "description": "Block major version module path changes that break imports",
         "matchPackageNames": [
           "/^github\\.com\\/cenkalti\\/backoff/",
