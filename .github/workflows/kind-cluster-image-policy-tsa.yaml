@@ -150,6 +150,8 @@ jobs:
 
     - name: Build timestamp-cli
       working-directory: ./src/github.com/sigstore/timestamp-authority
+      env:
+        GOTOOLCHAIN: auto
       run: |
         go build -o ./timestamp-cli ./cmd/timestamp-cli
 
