@@ -1,0 +1,71 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "gomod": {
+    "packageRules": [
+      {
+        "description": "Pin sigstore deps - cosign v3.0.6+ breaks ASN.1 signature validation, sigstore v1.10.9+ pulls go-containerregistry v0.21.7",
+        "matchPackageNames": [
+          "/^github\\.com\\/sigstore\\//"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Pin go-containerregistry - v0.21.6+ changes .local domains to HTTPS, breaking e2e tests",
+        "matchPackageNames": [
+          "/^github\\.com\\/google\\/go-containerregistry/"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Pin k8s.io deps to v0.36.x - v0.37.0 requires go 1.27 and structured-merge-diff/v7",
+        "matchPackageNames": [
+          "/^k8s\\.io\\//",
+          "/^sigs\\.k8s\\.io\\/structured-merge-diff/"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Pin otel - v1.45.0+ causes webhook CrashLoopBackOff (exit code 2)",
+        "matchPackageNames": [
+          "/^go\\.opentelemetry\\.io\\//"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Pin knative - newer versions require otel v1.45.0+",
+        "matchPackageNames": [
+          "/^knative\\.dev\\//"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Block major version module path changes that break imports",
+        "matchPackageNames": [
+          "/^github\\.com\\/cenkalti\\/backoff/",
+          "/^github\\.com\\/hashicorp\\/golang-lru/",
+          "/^github\\.com\\/hashicorp\\/hcl/",
+          "/^github\\.com\\/ThalesIgnite\\/crypto11/",
+          "/^github\\.com\\/theupdateframework\\/go-tuf/",
+          "/^github\\.com\\/golang-jwt\\/jwt/",
+          "/^github\\.com\\/tjfoc\\/gmsm/",
+          "/^github\\.com\\/google\\/go-github/",
+          "/^gomodules\\.xyz\\/jsonpatch/",
+          "/^gopkg\\.in\\/evanphx\\/json-patch/",
+          "/^go\\.yaml\\.in\\/yaml/",
+          "/^gitlab\\.com\\/gitlab-org\\/api\\/client-go/"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Block alibabacloud major version bumps (transitive deps of sigstore)",
+        "matchPackageNames": [
+          "/^github\\.com\\/alibabacloud-go\\/cr-20160607/",
+          "/^github\\.com\\/alibabacloud-go\\/cr-20181201/",
+          "/^github\\.com\\/alibabacloud-go\\/darabonba-openapi/",
+          "/^github\\.com\\/alibabacloud-go\\/tea-utils/"
+        ],
+        "enabled": false
+      }
+    ]
+  }
+}
