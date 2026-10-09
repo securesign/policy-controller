@@ -1,5 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "constraintsFiltering": "strict",
   "gomod": {
     "packageRules": [
       {
@@ -13,14 +14,6 @@
         "description": "Pin go-containerregistry - v0.21.6+ changes .local domains to HTTPS, breaking e2e tests",
         "matchPackageNames": [
           "/^github\\.com\\/google\\/go-containerregistry/"
-        ],
-        "enabled": false
-      },
-      {
-        "description": "Pin k8s.io deps to v0.36.x - v0.37.0 requires go 1.27 and structured-merge-diff/v7",
-        "matchPackageNames": [
-          "/^k8s\\.io\\//",
-          "/^sigs\\.k8s\\.io\\/structured-merge-diff/"
         ],
         "enabled": false
       },
@@ -39,9 +32,16 @@
         "enabled": false
       },
       {
-        "description": "Pin letsencrypt/boulder - newer versions require go >= 1.27",
+        "description": "Pin OPA - newer versions transitively pull otel v1.45.0+ and jwx/v4, causing webhook crashes",
         "matchPackageNames": [
-          "github.com/letsencrypt/boulder"
+          "/^github\\.com\\/open-policy-agent\\/opa/"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Block go-ini/ini - v1.67.3 declares module path as gopkg.in/ini.v1, causing module mismatch",
+        "matchPackageNames": [
+          "github.com/go-ini/ini"
         ],
         "enabled": false
       },
@@ -56,6 +56,8 @@
           "/^github\\.com\\/golang-jwt\\/jwt/",
           "/^github\\.com\\/tjfoc\\/gmsm/",
           "/^github\\.com\\/google\\/go-github/",
+          "/^github\\.com\\/lestrrat-go\\/jwx/",
+          "/^github\\.com\\/lestrrat-go\\/option/",
           "/^gomodules\\.xyz\\/jsonpatch/",
           "/^gopkg\\.in\\/evanphx\\/json-patch/",
           "/^go\\.yaml\\.in\\/yaml/",
