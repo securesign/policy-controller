@@ -1,0 +1,80 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "constraintsFiltering": "strict",
+  "gomod": {
+    "packageRules": [
+      {
+        "description": "Pin sigstore deps - cosign v3.0.6+ breaks ASN.1 signature validation, sigstore v1.10.9+ pulls go-containerregistry v0.21.7",
+        "matchPackageNames": [
+          "/^github\\.com\\/sigstore\\//"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Pin go-containerregistry - v0.21.6+ changes .local domains to HTTPS, breaking e2e tests",
+        "matchPackageNames": [
+          "/^github\\.com\\/google\\/go-containerregistry/"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Pin otel - v1.45.0+ causes webhook CrashLoopBackOff (exit code 2)",
+        "matchPackageNames": [
+          "/^go\\.opentelemetry\\.io\\//"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Pin knative - newer versions require otel v1.45.0+",
+        "matchPackageNames": [
+          "/^knative\\.dev\\//"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Pin OPA - newer versions transitively pull otel v1.45.0+ and jwx/v4, causing webhook crashes",
+        "matchPackageNames": [
+          "/^github\\.com\\/open-policy-agent\\/opa/"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Block go-ini/ini - v1.67.3 declares module path as gopkg.in/ini.v1, causing module mismatch",
+        "matchPackageNames": [
+          "github.com/go-ini/ini"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Block major version module path changes that break imports",
+        "matchPackageNames": [
+          "/^github\\.com\\/cenkalti\\/backoff/",
+          "/^github\\.com\\/hashicorp\\/golang-lru/",
+          "/^github\\.com\\/hashicorp\\/hcl/",
+          "/^github\\.com\\/ThalesIgnite\\/crypto11/",
+          "/^github\\.com\\/theupdateframework\\/go-tuf/",
+          "/^github\\.com\\/golang-jwt\\/jwt/",
+          "/^github\\.com\\/tjfoc\\/gmsm/",
+          "/^github\\.com\\/google\\/go-github/",
+          "/^github\\.com\\/lestrrat-go\\/jwx/",
+          "/^github\\.com\\/lestrrat-go\\/option/",
+          "/^gomodules\\.xyz\\/jsonpatch/",
+          "/^gopkg\\.in\\/evanphx\\/json-patch/",
+          "/^go\\.yaml\\.in\\/yaml/",
+          "/^gitlab\\.com\\/gitlab-org\\/api\\/client-go/"
+        ],
+        "enabled": false
+      },
+      {
+        "description": "Block alibabacloud major version bumps (transitive deps of sigstore)",
+        "matchPackageNames": [
+          "/^github\\.com\\/alibabacloud-go\\/cr-20160607/",
+          "/^github\\.com\\/alibabacloud-go\\/cr-20181201/",
+          "/^github\\.com\\/alibabacloud-go\\/darabonba-openapi/",
+          "/^github\\.com\\/alibabacloud-go\\/tea-utils/"
+        ],
+        "enabled": false
+      }
+    ]
+  }
+}
