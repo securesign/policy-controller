@@ -4,6 +4,11 @@
   "gomod": {
     "packageRules": [
       {
+        "description": "Do not bump the go directive - must stay at current version to prevent cascading dep upgrades",
+        "matchPackageNames": ["go"],
+        "enabled": false
+      },
+      {
         "description": "Pin sigstore deps - cosign v3.0.6+ breaks ASN.1 signature validation, sigstore v1.10.9+ pulls go-containerregistry v0.21.7",
         "matchPackageNames": [
           "/^github\\.com\\/sigstore\\//"
