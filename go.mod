@@ -1,6 +1,6 @@
 module github.com/sigstore/policy-controller
 
-go 1.26.5
+go 1.27.0
 
 require (
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
@@ -59,7 +59,7 @@ require (
 	k8s.io/apimachinery v0.37.1
 	k8s.io/client-go v0.37.1
 	k8s.io/code-generator v0.37.1
-	k8s.io/kube-openapi v0.0.0-20260721132016-d427ff9ee9ad
+	k8s.io/kube-openapi v0.0.0-20261014044854-ca3452a79603
 	knative.dev/hack v0.0.0-20260428014158-b2a37f1b6e7b
 	knative.dev/hack/schema v0.0.0-20260428014158-b2a37f1b6e7b
 	knative.dev/pkg v0.0.0-20260727151759-521cb33b33dd
@@ -143,14 +143,13 @@ require (
 	github.com/cyberphone/json-canonicalization v0.0.0-20261011152517-32a48195b9b2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.1 // indirect
-	github.com/digitorus/pkcs7 v0.0.0-20250730155240-ffadbf3f398c // indirect
-	github.com/digitorus/timestamp v0.0.0-20250524132541-c45532741eea // indirect
+	github.com/digitorus/pkcs7 v0.0.0-20260914070511-d678ea5ea03f // indirect
+	github.com/digitorus/timestamp v0.0.0-20260914073129-b4b58b92aa51 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/cli v29.9.1+incompatible // indirect
+	github.com/docker/cli v29.9.2+incompatible // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
-	github.com/emicklei/go-restful/v3 v3.13.0 // indirect
 	github.com/emicklei/proto v1.14.3 // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/fatih/color v1.19.0 // indirect
@@ -170,7 +169,7 @@ require (
 	github.com/go-openapi/runtime v0.33.3 // indirect
 	github.com/go-openapi/runtime/server-middleware v0.33.3 // indirect
 	github.com/go-openapi/spec v1.0.1 // indirect
-	github.com/go-openapi/strfmt v0.27.3 // indirect
+	github.com/go-openapi/strfmt v0.27.4 // indirect
 	github.com/go-openapi/swag v0.29.2 // indirect
 	github.com/go-openapi/swag/cmdutils v0.29.2 // indirect
 	github.com/go-openapi/swag/conv v0.29.2 // indirect
@@ -183,7 +182,7 @@ require (
 	github.com/go-openapi/swag/stringutils v0.29.2 // indirect
 	github.com/go-openapi/swag/typeutils v0.29.2 // indirect
 	github.com/go-openapi/swag/yamlutils v0.29.2 // indirect
-	github.com/go-openapi/validate v1.0.0 // indirect
+	github.com/go-openapi/validate v1.0.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/gobuffalo/flect v1.0.3 // indirect
 	github.com/gobwas/glob v1.0.0 // indirect
@@ -306,10 +305,10 @@ require (
 	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
-	google.golang.org/api v0.304.0 // indirect
-	google.golang.org/genproto v0.0.0-20261005182115-fad411399dd8 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261005182115-fad411399dd8 // indirect
+	google.golang.org/api v0.306.0 // indirect
+	google.golang.org/genproto v0.0.0-20261019180522-ce908d29299b // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20261019180522-ce908d29299b // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b // indirect
 	gopkg.in/evanphx/json-patch.v4 v4.13.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.3 // indirect
@@ -321,6 +320,7 @@ require (
 	sigs.k8s.io/json v0.0.0-20260909141634-11ed52e25bc5 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.4.2 // indirect
+	sigs.k8s.io/structured-merge-diff/v7 v7.0.0 // indirect
 	software.sslmate.com/src/go-pkcs12 v0.7.3 // indirect
 )
 
@@ -331,7 +331,7 @@ replace github.com/golang/glog => github.com/jdolitsky/glog v0.0.0-2021082011531
 replace (
 	// knative deps require to use an old k8s.io/gengo so we need to replace these ones
 	k8s.io/code-generator => k8s.io/code-generator v0.37.1
-	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20260721132016-d427ff9ee9ad
+	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20261014044854-ca3452a79603
 )
 
 // Pin otel packages to v1.44.0 to avoid webhook crashes (v1.45.0+ causes exit code 2)
