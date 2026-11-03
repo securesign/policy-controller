@@ -13,7 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 name: 'Dependency Review'
-on: [pull_request]
+on:
+  pull_request:
+    branches: [ 'main', 'release-*' ]
+    paths-ignore:
+      - 'Dockerfile.rh'
+      - 'Dockerfile.coverage'
+      - 'renovate.json'
+      - '.tekton/**'
+      - 'docs/**'
+      - 'LICENSE'
+      - '**/*.md'
 
 permissions:
   contents: read
