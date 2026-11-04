@@ -17,6 +17,14 @@ name: Test policy-controller with TrustRoot - Bring your own keys
 on:
   pull_request:
     branches: [ 'main', 'release-*' ]
+    paths-ignore:
+      - 'Dockerfile.rh'
+      - 'Dockerfile.coverage'
+      - 'renovate.json'
+      - '.tekton/**'
+      - 'docs/**'
+      - 'LICENSE'
+      - '**/*.md'
 
 defaults:
   run:

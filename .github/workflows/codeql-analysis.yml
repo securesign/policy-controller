@@ -17,7 +17,15 @@ name: CodeQL
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, release-* ]
+    paths-ignore:
+      - 'Dockerfile.rh'
+      - 'Dockerfile.coverage'
+      - 'renovate.json'
+      - '.tekton/**'
+      - 'docs/**'
+      - 'LICENSE'
+      - '**/*.md'
   schedule:
     - cron: '45 10 * * 1'
 
