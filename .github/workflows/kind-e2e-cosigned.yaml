@@ -18,6 +18,15 @@ on:
   pull_request:
     branches:
       - 'main'
+      - 'release-*'
+    paths-ignore:
+      - 'Dockerfile.rh'
+      - 'Dockerfile.coverage'
+      - 'renovate.json'
+      - '.tekton/**'
+      - 'docs/**'
+      - 'LICENSE'
+      - '**/*.md'
 
 permissions: {}
 
