@@ -38,7 +38,7 @@ spec:
   - name: fips-check
     value: "true"
   - name: image-version
-    value: "1.1.1"
+    value: "1.1.2"
   - name: release-version
     value: "1.5.1"
   pipelineRef:
