@@ -29,7 +29,7 @@ require (
 	github.com/hashicorp/hcl v1.0.1-vault-7
 	github.com/hashicorp/vault/api v1.23.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/konflux-ci/coverport/instrumentation/go v0.0.0-20261009063148-e4b4dacb404f
+	github.com/konflux-ci/coverport/instrumentation/go v0.0.0-20261120164020-96782a26f0d7
 	github.com/letsencrypt/boulder v0.20260921.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c

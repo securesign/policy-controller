@@ -36,6 +36,12 @@
       "enabled": false
     },
     {
+      "description": "Pin kube-openapi - newer revisions use structured-merge-diff/v7, which is incompatible with k8s.io/apimachinery v0.37",
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["k8s.io/kube-openapi"],
+      "enabled": false
+    },
+    {
       "description": "Pin sigstore deps - cosign v3.0.6+ breaks ASN.1 signature validation, sigstore v1.10.9+ pulls go-containerregistry v0.21.7",
       "matchPackageNames": [
         "/^github\\.com\\/sigstore\\//"
